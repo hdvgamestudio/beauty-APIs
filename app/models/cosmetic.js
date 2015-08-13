@@ -1,20 +1,48 @@
-var moongose = require('mongoose');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema
 
-var CosmeticSchema = new mongoose.Schema({
-  cosmetic_name: {
+var CosmeticSchema = new Schema({
+  name: {
     type: String,
     required: true
   },
   code: String,
-  created_at: Date,
-  updated_at: Date,
+  created_at: {
+    type: Date,
+    "default": Date.now
+  },
+  modified_at: Date,
   information: String,
   image_url: String,
-  category_id: String,
-  company: {company_name: String, country: String, website: String, founded: Date}
+  classifications: [{
+    type: Schema.ObjectId,
+    ref: 'Classification'
+  }],
+  company: {
+    name: String,
+    country: String,
+    website: String,
+    founded: Date
+  },
   country: String,
-  distributors: [],
-  metadata: {likes: Number, comments: Number, views: Number, rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]}}
+  distributors: [{
+    type: Schema.ObjectId,
+    ref: 'Distributor'
+  }],
+  metadata: {
+    likes: {
+      count: {
+        type: Number
+      },
+      users: [{
+        type: Schema.ObjectId,
+        ref: 'User'
+      }]
+    },
+    comments: Number,
+    views: Number,
+    rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]}
+  }
 });
 
-module.exports = monngoose.model('Cosmetic', CosmeticSchema);
+module.exports = mongoose.model('Cosmetic', CosmeticSchema);
