@@ -25,6 +25,10 @@ var UserSchema = new mongoose.Schema({
   created_at: {
     type: Date,
     "default": Date.now
+  },
+  is_active: {
+    type: Boolean,
+    "default": true
   }
 });
 
