@@ -1,9 +1,22 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var ClassificationSchema = new mongoose.Schema({
-  usage: {usage_id: String, usage: String},
-  physical_nature: {physical_nature_id: String, physical_nature: String},
-  functions: {functions_id: String, functions: String}
+var ClassificationSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  childs: [{
+    _id: {
+      type: Schema.ObjectId
+    },
+    name: {
+      type: String
+    }
+  }],
+  parents: {
+    type: Schema.ObjectId,
+  }
 });
 
 module.exports = mongoose.model('Classification', ClassificationSchema);

@@ -1,18 +1,18 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema
 
-var FakeTipSchema = new Schema({
+var VideoReviewSchema = new Schema({
   cosmetic: {
     type: Schema.ObjectId,
     required: true,
     ref: 'Cosmetic'
   },
-  tips: {
+  description: {
     type: String
   },
-  description: {
+  url: {
     type: String
   }
 });
 
-module.exports = mongoose.model('FakeTip', FakeTipSchema);
+module.exports = mongoose.model('VideoReview', VideoReview);

@@ -10,7 +10,11 @@ var UserSchema = new mongoose.Schema({
     type: String,
     required:true
   },
-  sex: { type: String, enum: ["M","F"] },
+  sex: {
+    type: String,
+    enum: ["N", "M","F"],
+    "default": "N"
+  },
   birthday: Date,
   email: {
     type: String,
