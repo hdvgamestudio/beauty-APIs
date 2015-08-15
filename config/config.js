@@ -12,6 +12,7 @@ var production = require('./env/production');
 
 var defaults = {
   secretKey: 'this is a secret key, right here',
+  apiPath: '/api/v1',
   info: {
       name: 'beauty-APIs',
       version: '1.0.0'
