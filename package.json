@@ -3,6 +3,7 @@
   "description": "Provide APIs related to cosmetics for clients",
   "engine": "node >= 0.4.1",
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "body-parser": "^1.13.3",
     "express": "^4.13.3",
     "jsonwebtoken": "^5.0.4",

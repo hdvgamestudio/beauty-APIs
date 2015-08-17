@@ -7,7 +7,7 @@ var express            = require('express');
 var mongoose           = require('mongoose');
 var bodyParser         = require('body-parser');
 var morgan             = require('morgan');
-var errorHandler       = require('./app/errors/errorHandler');
+var errorHandler       = require('./lib/errors/errorHandler');
 var config             = require('./config/config');
 
 var app = express();
@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 // Set up secret key for app
-app.set('superSecret', config.secretKey);
+// app.set('superSecret', config.secretKey);
 
 // Set router for app
 require('./app/routes')(app);
