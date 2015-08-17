@@ -1,25 +1,28 @@
 var express             = require('express');
 var config              = require('../config/config');
+var NotFoundError       = require('../lib/errors/notFoundError');
+var jwtAuth             = require('../lib/jwtAuth');
 var userController      = require('./controllers/user');
-var NotFoundError       = require('./errors/notFoundError');
-
-// Import controllers
-// var beerController  = require('./controllers/beer');
+var authController      = require('./controllers/auth');
 
 // Set router for app
-
 module.exports = function(app) {
   var router = express.Router();
 
   // Route to controllers
-  /*=== Index ===*/
+  /*--- Index ---*/
   router.route('/')
-    .get(function(req, res){
+    .get(function(req, res) {
       res.send('Hello! The beauty-APIs');
     });
 
-  /*=== User ===*/
+  /*--- Authenticate ---*/
+  router.route('/authenticate')
+    .post(authController.postAuthenticate);
+
+  /*--- User ---*/
   router.route('/users')
+    .get(jwtAuth.authenticate, userController.getUsers)
     .post(userController.postUsers);
 
   // Register all our routes with /api/v

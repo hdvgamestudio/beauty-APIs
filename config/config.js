@@ -11,13 +11,16 @@ var test = require('./env/test');
 var production = require('./env/production');
 
 var defaults = {
-  secretKey: 'this is a secret key, right here',
   apiPath: '/api/v1',
   info: {
-      name: 'beauty-APIs',
-      version: '1.0.0'
+    name: 'beauty-APIs',
+    version: '1.0.0'
   },
-  root: path.normalize(__dirname + '/..')
+  root: path.normalize(__dirname + '/..'),
+  jwt: {
+    secretKey: '123456',
+    expiresInMinutes: 1440 // Expires in 24 hours
+  }
 };
 
 /**
