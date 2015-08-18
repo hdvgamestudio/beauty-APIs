@@ -9,17 +9,17 @@ exports.postUsers = function(req, res, next) {
 
   user.save(function(err, data) {
     if (err) {
-      return next(new Error());
+      return next(new Error(err.message));
     }
 
-    res.json({message: 'User had been created sucessfully!', user: data});
+    res.json({success: true, user: data});
   });
 }
 
 exports.getUsers = function(req, res, next) {
   User.find(function(err, users) {
     if (err) {
-      return next(new Eror());
+      return next(new Error());
     }
 
     res.json(users);

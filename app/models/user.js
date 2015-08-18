@@ -2,6 +2,8 @@ var mongoose = require('mongoose'),
     bcrypt   = require('bcrypt'),
     SALT_WORK_FACTOR = 10;
 
+//var Error409 = require('../../lib/errors/error409');
+
 var UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -46,6 +48,13 @@ var UserSchema = new mongoose.Schema({
 // Save password encrypted by Bcrypt
 UserSchema.pre('save', function(next) {
     var user = this;
+
+    // Check if username exists
+    /*
+    User.find({ name: user.name }, function(err, users) {
+      if (users.length) return next(new Error409(409, "Username already existed!"));
+    });
+    */
 
     // Only hash the password if it has been modified (or is new)
     if (!user.isModified('password')) return next();

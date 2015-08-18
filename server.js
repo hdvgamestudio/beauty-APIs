@@ -31,9 +31,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-// Set up secret key for app
-// app.set('superSecret', config.secretKey);
-
 // Set router for app
 require('./app/routes')(app);
 
