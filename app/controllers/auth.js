@@ -1,5 +1,5 @@
 var User                        = require('../models/user');
-var UnauthorizedAccessError     = require('../../lib/errors/unauthorizedAccessError');
+var Error401                    = require('../../lib/errors/error401');
 var jwtAuth                     = require('../../lib/jwtAuth');
 
 
@@ -17,14 +17,14 @@ exports.postAuthenticate = function(req, res, next) {
       return next(new Error());
     } else {
 
-      if (!user) return next(new UnauthorizedAccessError());
+      if (!user) return next(new Error401());
 
       // Check if password matches
       user.comparePassword(password,  function(err, isMatch) {
 
         // If any error or password did not match
         if (err || !isMatch) {
-          return next(new UnauthorizedAccessError());
+          return next(new Error401());
         }
 
         // If password matches
