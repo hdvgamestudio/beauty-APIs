@@ -1,19 +1,32 @@
-var mongoose = require('mongoose'),
-    bcrypt   = require('bcrypt'),
-    SALT_WORK_FACTOR = 10;
+var mongoose                = require('mongoose'),
+    bcrypt                  = require('bcrypt'),
+    SALT_WORK_FACTOR        = 10;
 
-//var Error409 = require('../../lib/errors/error409');
+var Error409                = require('../../lib/errors/error409');
+var ApiMessages             = require('../../lib/apiMessage');
 
 var UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    unique: true,
-    required: true
   },
   password: {
     type: String,
-    required:true
   },
+	accounts: [{
+		account_type: {
+			//enum: ['internal', 'facebook', 'twitter', 'google']
+			type: String
+		},
+		uid: {
+			type: String
+		},
+    access_token: {
+      type: String
+    },
+    oss_attributes: {
+      type: Array
+    }
+	}],
   sex: {
     type: String,
     enum: ["N", "M","F"],
@@ -45,16 +58,24 @@ var UserSchema = new mongoose.Schema({
 
 /*-------Methods--------*/
 
+// Compare password
+UserSchema.methods.comparePassword = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
+};
+
+var User = mongoose.model('User', UserSchema);
+
 // Save password encrypted by Bcrypt
 UserSchema.pre('save', function(next) {
     var user = this;
 
     // Check if username exists
-    /*
     User.find({ name: user.name }, function(err, users) {
-      if (users.length) return next(new Error409(409, "Username already existed!"));
+      if (users.length) return next(new Error409(409, ApiMessages.USERNAME_ALREADY_EXISTS));
     });
-    */
 
     // Only hash the password if it has been modified (or is new)
     if (!user.isModified('password')) return next();
@@ -74,15 +95,7 @@ UserSchema.pre('save', function(next) {
     });
 });
 
-// Compare password
-UserSchema.methods.comparePassword = function(candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-        if (err) return cb(err);
-        cb(null, isMatch);
-    });
-};
-
 /*-------End Methods--------*/
 
 // Export the mongoose model
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User');
