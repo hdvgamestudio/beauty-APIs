@@ -1,39 +1,116 @@
 var Error400         = require('../../lib/errors/error400');
-var ApiMessages      = require('../../lib/apiMessage');
+var ApiErrors      = require('../../lib/apiError');
 var User             = require('../models/user');
-var validate         = require('jsonschema').validate
 var jwt              = require('../../lib/jwtAuth');
 
 
 exports.postUsers = function(req, res, next) {
 
   // Validate parameters request
-	var postUser = req.body.user;
-  console.log(postUser);
-	var validatedUser = validateAccount(postUser);
-  if (!validatedUser.success) {
-    console.log(validatedUser.error.message);
+  if (!req.body || !req.body.user) {
     return next(new Error400(
-          validatedUser.error.code,
-          validatedUser.error.message)
-        );
+			ApiErrors.USER_NOT_FOUND_REQ.code,
+			ApiErrors.USER_NOT_FOUND_REQ.msg
+		));
+  }
+	var newUser = req.body.user;
+  var user;
+  if (!newUser.account_type) {
+    return next(new Error400(
+			ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
+			ApiErrors.ACCOUNT_TYPE_REQUIRED.msg
+		));
   }
 
-  // If request is valid
-  var user = validatedUser.user;
+  switch (newUser.account_type) {
+    case "internal":
+			// Check if username and email existed
+		  if (!newUser.name)
+				return next(new Error400(
+					ApiErrors.USERNAME_REQUIRED.code,
+					ApiErrors.USERNAME_REQUIRED.msg
+				));
 
-  user.save(function(err, savedUser) {
-		console.log(savedUser);
-    if (err) {
-      return next(new Error(err.message));
-    }
-		var accessToken = jwt.createToken(savedUser);
-    res.json({
-			success: true,
-			user_id: savedUser._id,
-			access_token: accessToken
-		});
-  });
+		  if (!newUser.password)
+				return next(new Error400(
+					ApiErrors.PWD_REQUIRED.code,
+					ApiErrors.PWD_REQUIRED.msg
+				));
+
+			User.findOne({
+				name: newUser.name
+			}, function(err, user) {
+				if (err) return next(new Error());
+				if (user)
+				  return next(new Error400(
+						ApiErrors.USERNAME_EXISTED.code,
+						ApiErrors.USERNAME_EXISTED.msg
+					));
+
+			  // Check if email existed
+				if (newUser.email) {
+					User.findOne({
+						email: newUser.email
+					}, function(err, user) {
+						if (err) return next(new Error());
+						if (user)
+							return next(new Error400(
+								ApiErrors.EMAIL_EXISTED.code,
+								ApiErrors.EMAIL_EXISTED.msg
+							));
+
+						user = new User(newUser);
+						saveNewUser(res, user, next);
+					});
+				} else {
+					user = new User(newUser);
+					saveNewUser(res, user, next);
+        }
+			});
+      break;
+
+    case "facebook":
+			if (!newUser.uuid)
+				return (next (new Error400(
+					ApiErrors.FACEBOOKID_REQUIRED.code,
+					ApiErrors.FACEBOOKID_REQUIRED.msg
+				)));
+
+			// Check if uuid of facebook is existed
+			User.findOne({
+				social_accounts:{
+					$elemMatch: {
+						account_type: "facebook",
+				    uuid: newUser.uuid
+					}
+				}
+			}, function(err, user) {
+				if (err) return next(new Error());
+				// Not yet existed, then save DB and retrun access_token
+				if (!user) {
+					newUser.account_type = "facebook";
+					user = new User({
+						social_accounts: [newUser]
+					});
+					saveNewUser(res, user, next);
+				} else {
+					// Existed, return access_token
+					var accessToken = jwt.createToken(user);
+					res.json({
+						success: true,
+						user_id: user._id,
+						access_token: accessToken
+					});
+				}
+			});
+      break;
+
+    default:
+      return next(new Error400(
+				ApiErrors.INVALID_ACCOUNT_TYPE.code,
+				ApiErrors.INVALID_ACCOUNT_TYPE.msg
+			));
+  }
 }
 
 exports.getUsers = function(req, res, next) {
@@ -46,50 +123,14 @@ exports.getUsers = function(req, res, next) {
   });
 }
 
-var UserFacebookSchema = {
-	"type": "object",
-	"properties": {
-		"name": {"type": "string"},
-		"email": {"type": "string"},
-		"uid": {"type": "string"},
-		"access_token": {"type": "string"},
-		"account_type": {"type": "string"},
-		"oss_attributes": [
-			{"device_token": {"type": "string"},
-			  "type": {"type": "string"}
-			}
-		]
-	},
-	"required": ["uid"]
-
-}
-
-// Internal account
-function validateAccount(user) {
-	console.log(user.account_type);
-	switch (user.account_type) {
-		case "facebook":
-			validation = validate(user, UserFacebookSchema);
-			if (validation.errors.length != 0) {
-				return {
-					success: false,
-				 	error: {code: 0, message: "User validation failed"}
-				}
-			} else {
-				var userFb = new User({
-					name: user.name,
-					email: user.email,
-					accounts: [{
-						account_type: "facebook",
-					  uid: user.uid,
-					  access_token: user.access_token,
-            oss_attributes: user.oss_attributes
-					}]
-				});
-				return { success: true, user: userFb };
-			}
-		default:
-			return { success: false };
-	}
-
+function saveNewUser(res, user, next) {
+	user.save(function(err, savedUser) {
+		if (err) return next(new Error(err.message));
+		var accessToken = jwt.createToken(savedUser);
+		res.json({
+			success: true,
+			user_id: savedUser._id,
+			access_token: accessToken
+		});
+	});
 }
