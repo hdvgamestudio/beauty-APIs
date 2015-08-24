@@ -1,6 +1,6 @@
 var express             = require('express');
 var config              = require('../config/config');
-var NotFoundError       = require('../lib/errors/notFoundError');
+var Error404            = require('../lib/errors/error404');
 var jwtAuth             = require('../lib/jwtAuth');
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
@@ -30,6 +30,6 @@ module.exports = function(app) {
 
   // All other requests redirect to 404
   app.all("*", function (req, res, next) {
-    next(new NotFoundError());
+    next(new Error404());
   });
 }

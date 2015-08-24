@@ -6,6 +6,7 @@
 var express            = require('express');
 var mongoose           = require('mongoose');
 var bodyParser         = require('body-parser');
+var expressValidator   = require('express-validator');
 var morgan             = require('morgan');
 var errorHandler       = require('./lib/errors/errorHandler');
 var config             = require('./config/config');
@@ -30,9 +31,10 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+app.use(bodyParser.json());
 
-// Set up secret key for app
-// app.set('superSecret', config.secretKey);
+// Use express-validator to validate requests
+app.use(expressValidator());
 
 // Set router for app
 require('./app/routes')(app);
