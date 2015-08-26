@@ -1,6 +1,7 @@
 {
   "name": "beauty-APIs",
   "description": "Provide APIs related to cosmetics for clients",
+  "main": "server.js",
   "engine": "node >= 0.4.1",
   "dependencies": {
     "bcrypt": "^0.8.5",

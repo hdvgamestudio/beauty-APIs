@@ -151,15 +151,70 @@ exports.showUser = function(req, res, next) {
 
 exports.editUser = function(req, res, next) {
   var updatedUser = req.body.user;
-  User.findOne({"_id": req.params.id})
+  var id = req.params.id;
+  if (!updatedUser.name)
+    return next(new Error400(
+      ApiErrors.USERNAME_REQUIRED.code,
+      ApiErrors.USERNAME_REQUIRED.msg
+    ));
+  // Check name is unique
+  User.findOne({
+    name: updatedUser.name,
+    "_id": { $ne: id }})
     .exec(function(err, user) {
       if (err) return next(new Error(err.message));
+      if (user)
+        return next(new Error400(
+          ApiErrors.USERNAME_EXISTED.code,
+          ApiErrors.USERNAME_EXISTED.msg
+        ));
+      // If having email
+      if (updatedUser.email) {
+        User.findOne({
+          email: updatedUser.email,
+          "_id": { $ne: id }})
+          .exec(function(err, user){
+            if (err) return next(new Error(err.message));
+            if (user)
+              return next(new Error400(
+                ApiErrors.EMAIL_EXISTED.code,
+                ApiErrors.EMAIL_EXISTED.msg
+              ));
 
-      user = _.extend(user, updatedUser);
-      user.save(function(err, savedUser) {
-        if (err) return next(new Error(err.message));
-        res.json(user);
-      });
+            // If both name and email is valid, save the updated user
+            User.findOne({"_id": id})
+              .exec(function(err, user) {
+                if (err) return next(new Error(err.message));
+
+                user = _.extend(user, updatedUser);
+                user.save(function(err, savedUser) {
+                  if (err) return next(new Error(err.message));
+                  res.json(savedUser);
+                });
+              })
+          })
+      } else {
+          // If both name and email is valid, save the updated user
+          User.findOne({"_id": id})
+            .exec(function(err, user) {
+              if (err) {
+                return next(new Error(err.message));
+              }
+              if (!user)
+                return next(new Error404(
+                  ApiErrors.NOT_FOUND_RESOURCE.code,
+                  ApiErrors.NOT_FOUND_RESOURCE.msg
+                ));
+
+              user = _.extend(user, updatedUser);
+              user.save(function(err, savedUser) {
+                if (err) {
+                  return next(new Error(err.message));
+                }
+                res.json(savedUser);
+              });
+            })
+      }
     })
 }
 

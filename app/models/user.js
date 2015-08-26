@@ -66,7 +66,7 @@ var UserSchema = new mongoose.Schema({
     }
 	}]
 });
-
+//UserSchema.set('versionKey', false);
 
 /*-------Methods--------*/
 
