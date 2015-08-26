@@ -1,7 +1,8 @@
 var Error400         = require('../../lib/errors/error400');
-var ApiErrors      = require('../../lib/apiError');
+var ApiErrors        = require('../../lib/apiError');
 var User             = require('../models/user');
 var jwt              = require('../../lib/jwtAuth');
+var _                = require('underscore');
 
 
 exports.postUsers = function(req, res, next) {
@@ -40,7 +41,7 @@ exports.postUsers = function(req, res, next) {
 			User.findOne({
 				name: newUser.name
 			}, function(err, user) {
-				if (err) return next(new Error());
+				if (err) return next(new Error(err.message));
 				if (user)
 				  return next(new Error400(
 						ApiErrors.USERNAME_EXISTED.code,
@@ -52,7 +53,7 @@ exports.postUsers = function(req, res, next) {
 					User.findOne({
 						email: newUser.email
 					}, function(err, user) {
-						if (err) return next(new Error());
+						if (err) return next(new Error(err.message));
 						if (user)
 							return next(new Error400(
 								ApiErrors.EMAIL_EXISTED.code,
@@ -85,7 +86,7 @@ exports.postUsers = function(req, res, next) {
 					}
 				}
 			}, function(err, user) {
-				if (err) return next(new Error());
+				if (err) return next(new Error(err.message));
 				// Not yet existed, then save DB and retrun access_token
 				if (!user) {
 					newUser.account_type = "facebook";
@@ -114,14 +115,54 @@ exports.postUsers = function(req, res, next) {
 }
 
 exports.getUsers = function(req, res, next) {
-  User.find(function(err, users) {
-    if (err) {
-      return next(new Error());
-    }
+  var criteria = {}
+  // Search query criteria
+  if (req.query.q) {
+    var expr = new RegExp('.*' + req.query.q + '.*');
+    criteria.$or = [
+      {name: expr},
+      {mail: expr},
+      {address: expr},
+      {genre: expr}
+    ];
+  }
+  // Filter by genre
+  if (req.query.genre) {
+    criteria.genre = req.query.genre;
+  }
+  User.find(criteria)
+    .exec(function(err, users) {
+      if (err) {
+        return next(new Error(err.message));
+      }
+      res.json(users);
+  })
+}
 
-    res.json(users);
+exports.showUser = function(req, res, next) {
+  User.findOne({ "_id": req.params.id })
+    .exec(function(err, user) {
+       if (err) {
+         return next(new Error(err.message));
+       }
+       res.json(user);
   });
 }
+
+exports.editUser = function(req, res, next) {
+  var updatedUser = req.body.user;
+  User.findOne({"_id": req.params.id})
+    .exec(function(err, user) {
+      if (err) return next(new Error(err.message));
+
+      user = _.extend(user, updatedUser);
+      user.save(function(err, savedUser) {
+        if (err) return next(new Error(err.message));
+        res.json(user);
+      });
+    })
+}
+
 
 function saveNewUser(res, user, next) {
 	user.save(function(err, savedUser) {
