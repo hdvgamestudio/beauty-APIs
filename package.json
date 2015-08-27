@@ -1,6 +1,7 @@
 {
   "name": "beauty-APIs",
   "description": "Provide APIs related to cosmetics for clients",
+  "main": "server.js",
   "engine": "node >= 0.4.1",
   "dependencies": {
     "bcrypt": "^0.8.5",
@@ -10,6 +11,7 @@
     "jsonschema": "^1.0.2",
     "jsonwebtoken": "^5.0.4",
     "mongoose": "^4.1.1",
-    "morgan": "^1.6.1"
+    "morgan": "^1.6.1",
+    "underscore": "^1.8.3"
   }
 }

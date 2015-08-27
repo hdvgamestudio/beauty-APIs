@@ -2,6 +2,9 @@ var express             = require('express');
 var config              = require('../config/config');
 var Error404            = require('../lib/errors/error404');
 var jwtAuth             = require('../lib/jwtAuth');
+var validateID          = require('../app/middleware').validateID;
+var authorized          = require('../app/middleware').authorized;
+var authenticate        = require('../app/middleware').authenticate;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
 
@@ -22,8 +25,12 @@ module.exports = function(app) {
 
   /*--- User ---*/
   router.route('/users')
-    .get(jwtAuth.authenticate, userController.getUsers)
+    .get(authenticate, userController.getUsers)
     .post(userController.postUsers);
+
+	router.route('/users/:id')
+		.get(validateID, userController.showUser)
+		.put(authenticate, authorized, validateID, userController.editUser)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
