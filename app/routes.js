@@ -8,6 +8,7 @@ var authenticate        = require('../app/middleware').authenticate;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
 var productController   = require('./controllers/product');
+var commentController   = require('./controllers/comment');
 
 // Set router for app
 module.exports = function(app) {
@@ -30,18 +31,27 @@ module.exports = function(app) {
     .post(userController.postUsers);
 
 	router.route('/users/:id')
-		.get(validateID, userController.showUser)
-		.put(authenticate, authorized, validateID, userController.editUser)
-		.delete(authenticate, authorized, validateID, userController.deleteUser)
+		.get(validateID, userController.showUsers)
+		.put(authenticate, authorized, validateID, userController.editUsers)
+		.delete(authenticate, authorized, validateID, userController.deleteUsers)
 
-		/*--- Product ---*/
+  /*--- Product ---*/
 	router.route('/products')
 		.get(authenticate, productController.getProducts)
 		.post(productController.postProducts);
 	router.route('/products/:id')
-		.get(validateID, productController.showProduct)
-		.put(validateID, productController.editProduct)
-		.delete(validateID, productController.deleteProduct)
+		.get(validateID, productController.showProducts)
+		.put(validateID, productController.editProducts)
+		.delete(validateID, productController.deleteProducts)
+
+	/*--- Comment ---*/
+	router.route('/products/:id/comments')
+		.post(commentController.postComments)
+		.get(commentController.getComments)
+	router.route('/products/:product_id/comments/:comment_id')
+    .get(commentController.showComments)
+		.put(commentController.editComments)
+		.delete(commentController.deleteComments)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);

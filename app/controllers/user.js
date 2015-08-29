@@ -129,7 +129,7 @@ exports.getUsers = function(req, res, next) {
   })
 }
 
-exports.showUser = function(req, res, next) {
+exports.showUsers = function(req, res, next) {
   User.findOne({ "_id": req.params.id })
     .exec(function(err, user) {
       if (err) return next(err);
@@ -138,7 +138,7 @@ exports.showUser = function(req, res, next) {
   });
 }
 
-exports.editUser = function(req, res, next) {
+exports.editUsers = function(req, res, next) {
   var updatedUser = req.body.user;
   var id = req.params.id;
   if (!updatedUser.name)
@@ -203,7 +203,7 @@ exports.editUser = function(req, res, next) {
     })
 }
 
-exports.deleteUser = function(req, res, next) {
+exports.deleteUsers = function(req, res, next) {
   var id = req.params.id;
   User.findOne({"_id": id})
     .exec(function(err, user) {

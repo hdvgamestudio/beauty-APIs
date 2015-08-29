@@ -95,9 +95,10 @@ exports.getProducts = function(req, res, next) {
         if (err) return next(err);
         var records = {};
         records.total = count;
-        if (limit) {
+        if (limit && (limit != 0)) {
           records.offset = skip;
           records.limit = limit;
+					records.received_records = products.length;
           records.total_pages = Math.ceil(count/limit);
         }
         res.json({ products: products, records: records });
@@ -105,7 +106,7 @@ exports.getProducts = function(req, res, next) {
   });
 }
 
-exports.editProduct = function(req, res, next) {
+exports.editProducts = function(req, res, next) {
 
   var id = req.params.id;
   var updatedProduct = req.body.product;
@@ -145,7 +146,7 @@ exports.editProduct = function(req, res, next) {
    });
 }
 
-exports.showProduct = function(req, res, next) {
+exports.showProducts = function(req, res, next) {
   var id = req.params.id;
   var fields;
   if (req.params.fields) {
@@ -161,9 +162,9 @@ exports.showProduct = function(req, res, next) {
   });
 }
 
-exports.deleteProduct = function(req, res, next) {
+exports.deleteProducts = function(req, res, next) {
   var id = req.params.id;
-  Product.remove({_id: id})
+  Product.remove({ _id: id })
     .exec(function(err, product) {
       if (err) return next(err);
       // {"ok": 1, "n": 1}

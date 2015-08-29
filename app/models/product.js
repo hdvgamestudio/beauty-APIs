@@ -1,6 +1,16 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema
 
+var RateSchema = new Schema({
+  value: {
+    type: Number,
+    enum: [0, 1, 2, 3, 4, 5]
+  },
+  user_id: {
+    type: Schema.ObjectId
+  }
+});
+
 var ProductSchema = new Schema({
   name: {
     type: String,
@@ -30,24 +40,14 @@ var ProductSchema = new Schema({
     ref: 'Distributor'
   }],
   metadata: {
-    likes: {
-      count: {
-        type: Number
-      },
-      users: [{
-        type: Schema.ObjectId,
-        ref: 'User'
-      }]
-    },
-    comments: Number,
-    views: Number,
-    rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]}
+    rates: [RateSchema],
+    rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]},
+    comments: Number
   },
 	tags: [{
 		type: String
 	}]
 });
-
 
 ProductSchema.pre('save', function(next) {
 	var product = this;
