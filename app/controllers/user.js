@@ -7,15 +7,7 @@ var _                = require('underscore');
 
 exports.postUsers = function(req, res, next) {
 
-  // Validate parameters request
-  if (!req.body || !req.body.user) {
-    return next(new Error400(
-			ApiErrors.USER_NOT_FOUND_REQ.code,
-			ApiErrors.USER_NOT_FOUND_REQ.msg
-		));
-  }
 	var newUser = req.body.user;
-  var user;
   if (!newUser.account_type) {
     return next(new Error400(
 			ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
@@ -41,7 +33,7 @@ exports.postUsers = function(req, res, next) {
 			User.findOne({
 				name: newUser.name
 			}, function(err, user) {
-				if (err) return next(new Error(err.message));
+				if (err) return next(err);
 				if (user)
 				  return next(new Error400(
 						ApiErrors.USERNAME_EXISTED.code,
@@ -53,7 +45,7 @@ exports.postUsers = function(req, res, next) {
 					User.findOne({
 						email: newUser.email
 					}, function(err, user) {
-						if (err) return next(new Error(err.message));
+						if (err) return next(err);
 						if (user)
 							return next(new Error400(
 								ApiErrors.EMAIL_EXISTED.code,
@@ -86,7 +78,7 @@ exports.postUsers = function(req, res, next) {
 					}
 				}
 			}, function(err, user) {
-				if (err) return next(new Error(err.message));
+				if (err) return next(err);
 				// Not yet existed, then save DB and retrun access_token
 				if (!user) {
 					newUser.account_type = "facebook";
@@ -120,10 +112,10 @@ exports.getUsers = function(req, res, next) {
   if (req.query.q) {
     var expr = new RegExp('.*' + req.query.q + '.*');
     criteria.$or = [
-      {name: expr},
-      {mail: expr},
-      {address: expr},
-      {genre: expr}
+      { name: expr },
+      { mail: expr },
+      { address: expr },
+      { genre: expr }
     ];
   }
   // Filter by genre
@@ -132,9 +124,7 @@ exports.getUsers = function(req, res, next) {
   }
   User.find(criteria)
     .exec(function(err, users) {
-      if (err) {
-        return next(new Error(err.message));
-      }
+      if (err) return next(err);
       res.json(users);
   })
 }
@@ -142,10 +132,9 @@ exports.getUsers = function(req, res, next) {
 exports.showUser = function(req, res, next) {
   User.findOne({ "_id": req.params.id })
     .exec(function(err, user) {
-       if (err) {
-         return next(new Error(err.message));
-       }
-       res.json(user);
+      if (err) return next(err);
+			if (!user) res.json({});
+			else res.json(user);
   });
 }
 
@@ -162,7 +151,7 @@ exports.editUser = function(req, res, next) {
     name: updatedUser.name,
     "_id": { $ne: id }})
     .exec(function(err, user) {
-      if (err) return next(new Error(err.message));
+      if (err) return next(err);
       if (user)
         return next(new Error400(
           ApiErrors.USERNAME_EXISTED.code,
@@ -174,7 +163,7 @@ exports.editUser = function(req, res, next) {
           email: updatedUser.email,
           "_id": { $ne: id }})
           .exec(function(err, user){
-            if (err) return next(new Error(err.message));
+            if (err) return next(err);
             if (user)
               return next(new Error400(
                 ApiErrors.EMAIL_EXISTED.code,
@@ -184,11 +173,11 @@ exports.editUser = function(req, res, next) {
             // If both name and email is valid, save the updated user
             User.findOne({"_id": id})
               .exec(function(err, user) {
-                if (err) return next(new Error(err.message));
+                if (err) return next(err);
 
                 user = _.extend(user, updatedUser);
                 user.save(function(err, savedUser) {
-                  if (err) return next(new Error(err.message));
+                  if (err) return next(err);
                   res.json(savedUser);
                 });
               })
@@ -197,9 +186,7 @@ exports.editUser = function(req, res, next) {
           // If both name and email is valid, save the updated user
           User.findOne({"_id": id})
             .exec(function(err, user) {
-              if (err) {
-                return next(new Error(err.message));
-              }
+              if (err) return next(err);
               if (!user)
                 return next(new Error404(
                   ApiErrors.NOT_FOUND_RESOURCE.code,
@@ -208,9 +195,7 @@ exports.editUser = function(req, res, next) {
 
               user = _.extend(user, updatedUser);
               user.save(function(err, savedUser) {
-                if (err) {
-                  return next(new Error(err.message));
-                }
+                if (err) return next(err);
                 res.json(savedUser);
               });
             })
@@ -218,10 +203,27 @@ exports.editUser = function(req, res, next) {
     })
 }
 
+exports.deleteUser = function(req, res, next) {
+  var id = req.params.id;
+  User.findOne({"_id": id})
+    .exec(function(err, user) {
+      if (err) return next(err);
+      if (!user)
+        return next(new Error404(
+          ApiErrors.NOT_FOUND_RESOURCE.code,
+          ApiErrors.NOT_FOUND_RESOURCE.msg
+        ));
+      user.is_active = false;
+      user.save(function(err, user) {
+        if (err) return next(err);
+        res.json(user);
+      });
+    })
+}
 
 function saveNewUser(res, user, next) {
 	user.save(function(err, savedUser) {
-		if (err) return next(new Error(err.message));
+		if (err) return next(err);
 		var accessToken = jwt.createToken(savedUser);
 		res.json({
 			success: true,

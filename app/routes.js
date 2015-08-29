@@ -7,6 +7,7 @@ var authorized          = require('../app/middleware').authorized;
 var authenticate        = require('../app/middleware').authenticate;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
+var productController   = require('./controllers/product');
 
 // Set router for app
 module.exports = function(app) {
@@ -31,6 +32,16 @@ module.exports = function(app) {
 	router.route('/users/:id')
 		.get(validateID, userController.showUser)
 		.put(authenticate, authorized, validateID, userController.editUser)
+		.delete(authenticate, authorized, validateID, userController.deleteUser)
+
+		/*--- Product ---*/
+	router.route('/products')
+		.get(authenticate, productController.getProducts)
+		.post(productController.postProducts);
+	router.route('/products/:id')
+		.get(validateID, productController.showProduct)
+		.put(validateID, productController.editProduct)
+		.delete(validateID, productController.deleteProduct)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);

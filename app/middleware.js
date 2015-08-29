@@ -62,6 +62,26 @@ function validateID(req, res, next) {
   }
 }
 
+// Validate body request for put, post medthod
+
+function validateBody() {
+	return function(req, res, next) {
+		if ((req.method === 'PUT') || (req.method === 'POST')) {
+			var urls = req.originalUrl.split('/');
+			var resource = (req.method === 'PUT') ? urls[urls.length - 2] : urls[urls.length - 1];
+			// Remove 's' character: ex: products => product
+			resource = resource.slice(0, -1);
+			if (!req.body || !req.body[resource]) {
+				return next(new Error400(
+					ApiErrors.RESOURCE_NOT_FOUND_REQ.code,
+					ApiErrors.RESOURCE_NOT_FOUND_REQ.msg
+				));
+			}
+		}
+		next();
+	}
+}
+
 // user itself or isAdmin
 function authorized(req, res, next) {
   //user itself: req.decoded._id = req.params.id
@@ -78,5 +98,6 @@ module.exports = {
   authenticate : authenticate,
   createToken  : createToken,
   validateID: validateID,
+	validateBody: validateBody,
   authorized: authorized
 }
