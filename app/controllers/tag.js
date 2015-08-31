@@ -4,8 +4,8 @@ var Tag = require('../models/tag');
 
 
 exports.getTags = function(req, res, next) {
-  var offset = parseInt(req.query.offset);
-  var limit = parseInt(req.query.limit);
+  var offset = req.query.offset;
+  var limit = req.query.limit;
 	Tag.find(function(err, users) {
 		if(err) res.json(err);
 		else res.json(users);
