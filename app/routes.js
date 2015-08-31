@@ -8,13 +8,10 @@ var authenticate        = require('../app/middleware').authenticate;
 var validateBody        = require('../app/middleware').validateBody;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
-<<<<<<< HEAD
 var productController   = require('./controllers/product');
 var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
-=======
 var tagController				= require('./controllers/tag');
->>>>>>> e7da3ec... add tag
 
 // Set router for app
 module.exports = function(app) {
@@ -37,7 +34,6 @@ module.exports = function(app) {
     .post(validateBody, userController.postUsers);
 
 	router.route('/users/:id')
-<<<<<<< HEAD
 		.get(validateID, userController.showUsers)
 		.put(authenticate, authorized, validateID, validateBody, userController.editUsers)
 		.delete(authenticate, authorized, validateID, userController.deleteUsers)
@@ -65,14 +61,10 @@ module.exports = function(app) {
 		.post(validateID, validateBody, likeController.postLikes)
 		.get(validateID, likeController.getLikes)
 
-=======
-		.get(validateID, userController.showUser)
-		.put(authenticate, authorized, validateID, userController.editUser)
 	/*--- Tag ---*/
 	router.route('/tags')
 		.get(tagController.getTags)
 		.post(tagController.postTags);
->>>>>>> e7da3ec... add tag
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
 
