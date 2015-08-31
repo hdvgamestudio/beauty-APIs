@@ -98,7 +98,7 @@ exports.getProducts = function(req, res, next) {
         if (limit && (limit != 0)) {
           records.offset = skip;
           records.limit = limit;
-					records.received_records = products.length;
+          records.received_records = products.length;
           records.total_pages = Math.ceil(count/limit);
         }
         res.json({ products: products, records: records });
