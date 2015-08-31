@@ -7,6 +7,7 @@ var authorized          = require('../app/middleware').authorized;
 var authenticate        = require('../app/middleware').authenticate;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
+var tagController				= require('./controllers/tag');
 
 // Set router for app
 module.exports = function(app) {
@@ -31,7 +32,10 @@ module.exports = function(app) {
 	router.route('/users/:id')
 		.get(validateID, userController.showUser)
 		.put(authenticate, authorized, validateID, userController.editUser)
-
+	/*--- Tag ---*/
+	router.route('/tags')
+		.get(tagController.getTags)
+		.post(tagController.postTags);
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
 
