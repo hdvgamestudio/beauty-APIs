@@ -26,7 +26,11 @@ var ReplySchema = new Schema({
 		users: [{
 			type: Schema.ObjectId,
 			ref: 'User'
-		}]
+		}],
+		count: {
+			type: Number,
+			"default": 0
+		}
 	}
 });
 
@@ -59,8 +63,13 @@ var CommentSchema = new Schema({
 	likes: {
 		users: [{
 			type: Schema.ObjectId,
+			required: true,
 			ref: 'User'
-		}]
+		}],
+		count: {
+			type: Number,
+			"default": 0,
+		}
 	},
 	replies: [ReplySchema]
 });

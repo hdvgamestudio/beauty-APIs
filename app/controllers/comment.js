@@ -45,6 +45,7 @@ exports.showComments = function(req, res, next) {
 	Comment.findOne({_id: id})
 		.exec(function(err, comment) {
 			if (err) return next(err);
+			if (!comment) res.json({});
 			res.json(comment);
 	});
 };

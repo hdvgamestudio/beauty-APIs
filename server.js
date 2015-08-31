@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-app.use(middleware.validateBody());
+//app.use(middleware.validateBody());
 
 // Use express-validator to validate requests
 app.use(expressValidator());

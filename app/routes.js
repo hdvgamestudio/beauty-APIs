@@ -5,10 +5,12 @@ var jwtAuth             = require('../lib/jwtAuth');
 var validateID          = require('../app/middleware').validateID;
 var authorized          = require('../app/middleware').authorized;
 var authenticate        = require('../app/middleware').authenticate;
+var validateBody        = require('../app/middleware').validateBody;
 var userController      = require('./controllers/user');
 var authController      = require('./controllers/auth');
 var productController   = require('./controllers/product');
 var commentController   = require('./controllers/comment');
+var likeController      = require('./controllers/like');
 
 // Set router for app
 module.exports = function(app) {
@@ -28,30 +30,35 @@ module.exports = function(app) {
   /*--- User ---*/
   router.route('/users')
     .get(authenticate, userController.getUsers)
-    .post(userController.postUsers);
+    .post(validateBody, userController.postUsers);
 
 	router.route('/users/:id')
 		.get(validateID, userController.showUsers)
-		.put(authenticate, authorized, validateID, userController.editUsers)
+		.put(authenticate, authorized, validateID, validateBody, userController.editUsers)
 		.delete(authenticate, authorized, validateID, userController.deleteUsers)
 
   /*--- Product ---*/
 	router.route('/products')
 		.get(authenticate, productController.getProducts)
-		.post(productController.postProducts);
+		.post(validateBody, productController.postProducts);
 	router.route('/products/:id')
 		.get(validateID, productController.showProducts)
-		.put(validateID, productController.editProducts)
+		.put(validateID, validateBody, productController.editProducts)
 		.delete(validateID, productController.deleteProducts)
 
 	/*--- Comment ---*/
 	router.route('/products/:id/comments')
-		.post(commentController.postComments)
-		.get(commentController.getComments)
+		.post(validateID, validateBody, commentController.postComments)
+		.get(validateID, commentController.getComments)
 	router.route('/products/:product_id/comments/:comment_id')
-    .get(commentController.showComments)
-		.put(commentController.editComments)
-		.delete(commentController.deleteComments)
+    .get(validateID, commentController.showComments)
+		.put(validateID, validateBody, commentController.editComments)
+		.delete(validateID, commentController.deleteComments)
+
+	/*--- Like ---*/
+	router.route('/products/:product_id/comments/:comment_id/likes')
+		.post(validateID, validateBody, likeController.postLikes)
+		.get(validateID, likeController.getLikes)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
