@@ -38,28 +38,40 @@ var createToken = function(obj, secretKey, expiration) {
   var expiration = typeof expiration !== 'undefined'
                     ? expiration : config.jwt.expiresInMinutes;
 
-  return jwt.sign(obj, secretKey,
-           { expiresInMinutes: expiration }
-         );
+  return jwt.sign(obj, secretKey, { expiresInMinutes: expiration });
 
 }
 
 function validateID(req, res, next) {
-  if (req.params.id) {
-    if (!helper.isValidObjectId(req.params.id)) {
-      return next(new Error400(
-        ApiErrors.INVALID_ID.code,
-        ApiErrors.INVALID_ID.msg
-      ));
-    }
-    // If Id is valid
-    next();
-  } else {
-    return next(new Error400(
-      ApiErrors.MISSING_ID.code,
-      ApiErrors.MISSING_ID.msg
-    ));
-  }
+	for (var param in req.params) {
+		if (String(param).indexOf("id") > -1) {
+			if (!helper.isValidObjectId(req.params[param])) {
+				return next(new Error400(
+					ApiErrors.INVALID_ID.code,
+					ApiErrors.INVALID_ID.msg
+				));
+			}
+		}
+	}
+	next();
+}
+
+// Validate body request for put, post medthod
+
+function validateBody(req, res, next) {
+	if ((req.method === 'PUT') || (req.method === 'POST')) {
+		var urls = req.originalUrl.split('/');
+		var resource = (req.method === 'PUT') ? urls[urls.length - 2] : urls[urls.length - 1];
+		// Remove 's' character: ex: products => product
+		resource = resource.slice(0, -1);
+		if (!req.body || !req.body[resource]) {
+			return next(new Error400(
+				ApiErrors.RESOURCE_NOT_FOUND_REQ.code,
+				ApiErrors.RESOURCE_NOT_FOUND_REQ.msg
+			));
+		}
+	}
+	next();
 }
 
 // user itself or isAdmin
@@ -78,5 +90,6 @@ module.exports = {
   authenticate : authenticate,
   createToken  : createToken,
   validateID: validateID,
+	validateBody: validateBody,
   authorized: authorized
 }
