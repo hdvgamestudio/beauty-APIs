@@ -44,15 +44,15 @@ var ProductSchema = new Schema({
     rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]},
     comments: Number
   },
-	tags: [{
-		type: String
-	}]
+  tags: [{
+    type: String
+  }]
 });
 
 ProductSchema.pre('save', function(next) {
-	var product = this;
-	product.modified_at = new Date();
-	next();
+  var product = this;
+  product.modified_at = new Date();
+  next();
 });
 
 module.exports = mongoose.model('Product', ProductSchema);

@@ -9,41 +9,41 @@ exports.postAuthenticate = function(req, res, next) {
   // Validate user in body request
   if (!req.body || !req.body.user) {
     return next(new Error400(
-			ApiErrors.ACCOUNT_NOT_FOUND_REQ.code,
-			ApiErrors.ACCOUNT_NOT_FOUND_REQ.msg
-		));
+      ApiErrors.ACCOUNT_NOT_FOUND_REQ.code,
+      ApiErrors.ACCOUNT_NOT_FOUND_REQ.msg
+    ));
   }
   var loginUser = req.body.user;
   if (!loginUser.account_type) {
     return next(new Error400(
-			ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
-			ApiErrors.ACCOUNT_TYPE_REQUIRED.msg
-		));
+      ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
+      ApiErrors.ACCOUNT_TYPE_REQUIRED.msg
+    ));
   }
 
   switch (loginUser.account_type) {
     case "internal":
       if (!loginUser.name)
         return next(new Error400(
-					ApiErrors.USERNAME_REQUIRED.code,
-					ApiErrors.USERNAME_REQUIRED.msg
-				));
+          ApiErrors.USERNAME_REQUIRED.code,
+          ApiErrors.USERNAME_REQUIRED.msg
+        ));
 
       if (!loginUser.password)
         return next(new Error400(
-					ApiErrors.PWD_REQUIRED.code,
-					ApiErrors.PWD_REQUIRED.msg
-				));
+          ApiErrors.PWD_REQUIRED.code,
+          ApiErrors.PWD_REQUIRED.msg
+        ));
 
       // If name and password are valid
       loginInternalUser(res, loginUser, next);
       break;
     case "facebook":
-			if (!loginUser.uuid)
-				return (next (new Error400(
-					ApiErrors.FACEBOOKID_REQUIRED.code,
-					ApiErrors.FACEBOOKID_REQUIRED.msg
-				)));
+      if (!loginUser.uuid)
+        return (next (new Error400(
+          ApiErrors.FACEBOOKID_REQUIRED.code,
+          ApiErrors.FACEBOOKID_REQUIRED.msg
+        )));
       User.findOne({
         social_accounts: {
           $elemMatch: {
@@ -67,9 +67,9 @@ exports.postAuthenticate = function(req, res, next) {
       break;
     default:
       return next(new Error400(
-				ApiErrors.INVALID_ACCOUNT_TYPE.code,
-			 	ApiErrors.INVALID_ACCOUNT_TYPE.msg
-			));
+        ApiErrors.INVALID_ACCOUNT_TYPE.code,
+        ApiErrors.INVALID_ACCOUNT_TYPE.msg
+      ));
   }
 }
 

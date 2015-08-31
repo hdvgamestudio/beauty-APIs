@@ -16,20 +16,20 @@ var UserSchema = new mongoose.Schema({
     "default": "notgiven"
   },
   birthday: {
-		type: Date
-	},
+    type: Date
+  },
   email: {
     type: String
   },
   address: {
-		type: String
-	},
+    type: String
+  },
   phone_number: {
     type: Number,
   },
   avatar_url: {
-		type: String,
-	},
+    type: String,
+  },
   created_at: {
     type: Date,
     "default": Date.now
@@ -45,26 +45,26 @@ var UserSchema = new mongoose.Schema({
     type: Boolean,
     "default": false
   },
-	social_accounts: [{
-		account_type: {
-			type: String,
-			enum: [ "facebook", "twitter", "google" ],
-			required: true
-		},
-		uuid: {
-			type: String,
-			required: true
-		},
-		access_token: {
-			type: String
-		},
+  social_accounts: [{
+    account_type: {
+      type: String,
+      enum: [ "facebook", "twitter", "google" ],
+      required: true
+    },
+    uuid: {
+      type: String,
+      required: true
+    },
+    access_token: {
+      type: String
+    },
     email: {
       type: String
     },
     name: {
       type: String
     }
-	}]
+  }]
 });
 //UserSchema.set('versionKey', false);
 

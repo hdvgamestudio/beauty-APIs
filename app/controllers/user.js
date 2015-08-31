@@ -7,102 +7,102 @@ var _                = require('underscore');
 
 exports.postUsers = function(req, res, next) {
 
-	var newUser = req.body.user;
+  var newUser = req.body.user;
   if (!newUser.account_type) {
     return next(new Error400(
-			ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
-			ApiErrors.ACCOUNT_TYPE_REQUIRED.msg
-		));
+      ApiErrors.ACCOUNT_TYPE_REQUIRED.code,
+      ApiErrors.ACCOUNT_TYPE_REQUIRED.msg
+    ));
   }
 
   switch (newUser.account_type) {
     case "internal":
-			// Check if username and email existed
-		  if (!newUser.name)
-				return next(new Error400(
-					ApiErrors.USERNAME_REQUIRED.code,
-					ApiErrors.USERNAME_REQUIRED.msg
-				));
+      // Check if username and email existed
+      if (!newUser.name)
+        return next(new Error400(
+          ApiErrors.USERNAME_REQUIRED.code,
+          ApiErrors.USERNAME_REQUIRED.msg
+        ));
 
-		  if (!newUser.password)
-				return next(new Error400(
-					ApiErrors.PWD_REQUIRED.code,
-					ApiErrors.PWD_REQUIRED.msg
-				));
+      if (!newUser.password)
+        return next(new Error400(
+          ApiErrors.PWD_REQUIRED.code,
+          ApiErrors.PWD_REQUIRED.msg
+        ));
 
-			User.findOne({
-				name: newUser.name
-			}, function(err, user) {
-				if (err) return next(err);
-				if (user)
-				  return next(new Error400(
-						ApiErrors.USERNAME_EXISTED.code,
-						ApiErrors.USERNAME_EXISTED.msg
-					));
+      User.findOne({
+        name: newUser.name
+      }, function(err, user) {
+        if (err) return next(err);
+        if (user)
+          return next(new Error400(
+            ApiErrors.USERNAME_EXISTED.code,
+            ApiErrors.USERNAME_EXISTED.msg
+          ));
 
-			  // Check if email existed
-				if (newUser.email) {
-					User.findOne({
-						email: newUser.email
-					}, function(err, user) {
-						if (err) return next(err);
-						if (user)
-							return next(new Error400(
-								ApiErrors.EMAIL_EXISTED.code,
-								ApiErrors.EMAIL_EXISTED.msg
-							));
+        // Check if email existed
+        if (newUser.email) {
+          User.findOne({
+            email: newUser.email
+          }, function(err, user) {
+            if (err) return next(err);
+            if (user)
+              return next(new Error400(
+                ApiErrors.EMAIL_EXISTED.code,
+                ApiErrors.EMAIL_EXISTED.msg
+              ));
 
-						user = new User(newUser);
-						saveNewUser(res, user, next);
-					});
-				} else {
-					user = new User(newUser);
-					saveNewUser(res, user, next);
+            user = new User(newUser);
+            saveNewUser(res, user, next);
+          });
+        } else {
+          user = new User(newUser);
+          saveNewUser(res, user, next);
         }
-			});
+      });
       break;
 
     case "facebook":
-			if (!newUser.uuid)
-				return (next (new Error400(
-					ApiErrors.FACEBOOKID_REQUIRED.code,
-					ApiErrors.FACEBOOKID_REQUIRED.msg
-				)));
+      if (!newUser.uuid)
+        return (next (new Error400(
+          ApiErrors.FACEBOOKID_REQUIRED.code,
+          ApiErrors.FACEBOOKID_REQUIRED.msg
+        )));
 
-			// Check if uuid of facebook is existed
-			User.findOne({
-				social_accounts:{
-					$elemMatch: {
-						account_type: "facebook",
-				    uuid: newUser.uuid
-					}
-				}
-			}, function(err, user) {
-				if (err) return next(err);
-				// Not yet existed, then save DB and retrun access_token
-				if (!user) {
-					newUser.account_type = "facebook";
-					user = new User({
-						social_accounts: [newUser]
-					});
-					saveNewUser(res, user, next);
-				} else {
-					// Existed, return access_token
-					var accessToken = jwt.createToken(user);
-					res.json({
-						success: true,
-						user_id: user._id,
-						access_token: accessToken
-					});
-				}
-			});
+      // Check if uuid of facebook is existed
+      User.findOne({
+        social_accounts:{
+          $elemMatch: {
+            account_type: "facebook",
+            uuid: newUser.uuid
+          }
+        }
+      }, function(err, user) {
+        if (err) return next(err);
+        // Not yet existed, then save DB and retrun access_token
+        if (!user) {
+          newUser.account_type = "facebook";
+          user = new User({
+            social_accounts: [newUser]
+          });
+          saveNewUser(res, user, next);
+        } else {
+          // Existed, return access_token
+          var accessToken = jwt.createToken(user);
+          res.json({
+            success: true,
+            user_id: user._id,
+            access_token: accessToken
+          });
+        }
+      });
       break;
 
     default:
       return next(new Error400(
-				ApiErrors.INVALID_ACCOUNT_TYPE.code,
-				ApiErrors.INVALID_ACCOUNT_TYPE.msg
-			));
+        ApiErrors.INVALID_ACCOUNT_TYPE.code,
+        ApiErrors.INVALID_ACCOUNT_TYPE.msg
+      ));
   }
 }
 
@@ -133,8 +133,8 @@ exports.showUsers = function(req, res, next) {
   User.findOne({ "_id": req.params.id })
     .exec(function(err, user) {
       if (err) return next(err);
-			if (!user) res.json({});
-			else res.json(user);
+      if (!user) res.json({});
+      else res.json(user);
   });
 }
 
@@ -222,13 +222,13 @@ exports.deleteUsers = function(req, res, next) {
 }
 
 function saveNewUser(res, user, next) {
-	user.save(function(err, savedUser) {
-		if (err) return next(err);
-		var accessToken = jwt.createToken(savedUser);
-		res.json({
-			success: true,
-			user_id: savedUser._id,
-			access_token: accessToken
-		});
-	});
+  user.save(function(err, savedUser) {
+    if (err) return next(err);
+    var accessToken = jwt.createToken(savedUser);
+    res.json({
+      success: true,
+      user_id: savedUser._id,
+      access_token: accessToken
+    });
+  });
 }
