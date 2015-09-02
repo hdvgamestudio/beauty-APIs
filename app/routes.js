@@ -12,6 +12,7 @@ var productController   = require('./controllers/product');
 var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
 var tagController       = require('./controllers/tag');
+var replyController     = require('./controllers/reply');
 
 // Set router for app
 module.exports = function(app) {
@@ -65,6 +66,15 @@ module.exports = function(app) {
   router.route('/tags')
     .get(tagController.getTags)
     .post(tagController.postTags);
+
+  /*-- Reply --*/
+  router.route('/products/:product_id/comments/:comment_id/replies')
+    .post(validateID, replyController.postReplies)
+    .get(validateID, replyController.getReplies);
+  router.route('/products/:product_id/comments/:comment_id/replies/:reply_id')
+    .put(validateID, replyController.editReplies)
+    .delete(validateID, replyController.deleteReplies);
+
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
 

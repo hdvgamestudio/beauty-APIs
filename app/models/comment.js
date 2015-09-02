@@ -18,6 +18,9 @@ var ReplySchema = new Schema({
     type: Date,
     "default": Date.now
   },
+  modified_at: {
+    type: Date
+  },
   message: {
     type: String,
     required: true
@@ -55,6 +58,9 @@ var CommentSchema = new Schema({
   posted_at: {
     type: Date,
     "default": Date.now
+  },
+  modified_at: {
+    type: Date
   },
   message: {
     type: String,
