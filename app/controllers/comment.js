@@ -54,7 +54,6 @@ exports.showComments = function(req, res, next) {
 
 exports.editComments = function(req, res, next) {
   var updatedComment = req.body.comment;
-  console.log(JSON.stringify(req.params));
   Comment.findOne({ _id: req.params.comment_id })
     .exec(function(err, comment) {
       if (err) return next(err);
