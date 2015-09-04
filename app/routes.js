@@ -15,6 +15,7 @@ var tagController       = require('./controllers/tag');
 var replyController     = require('./controllers/reply');
 var replyController     = require('./controllers/reply');
 var replyLikeController = require('./controllers/replyLike');
+var rateController      = require('./controllers/rate');
 
 // Set router for app
 module.exports = function(app) {
@@ -69,6 +70,11 @@ module.exports = function(app) {
     .get(tagController.getTags)
     .post(tagController.postTags);
 
+  /*--- Like ---*/
+  router.route('/products/:product_id/comments/:comment_id/likes')
+    .post(validateID, validateBody, likeController.postLikes)
+    .get(validateID, likeController.getLikes)
+
   /*-- Reply --*/
   router.route('/products/:product_id/comments/:comment_id/replies')
     .post(validateID, replyController.postReplies)
@@ -77,10 +83,15 @@ module.exports = function(app) {
     .put(validateID, replyController.editReplies)
     .delete(validateID, replyController.deleteReplies);
 
-	/*--- LikeReply ---*/
-	router.route('/products/:product_id/comments/:comment_id/replies/:reply_id/likes')
-		.post(validateID, validateBody, replyLikeController.postLikes)
-		.get(validateID, replyLikeController.getLikes)
+  /*--- LikeReply ---*/
+  router.route('/products/:product_id/comments/:comment_id/replies/:reply_id/likes')
+    .post(validateID, validateBody, replyLikeController.postLikes)
+    .get(validateID, replyLikeController.getLikes)
+
+  /*--- Rate ---*/
+   router.route('/products/:id/rates')
+    .post(validateID, rateController.postRates)
+    .get(validateID, rateController.getRates)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
