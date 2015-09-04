@@ -13,6 +13,7 @@ var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
 var replyController     = require('./controllers/reply');
 var replyLikeController = require('./controllers/replyLike');
+var rateController      = require('./controllers/rate');
 
 // Set router for app
 module.exports = function(app) {
@@ -34,33 +35,33 @@ module.exports = function(app) {
     .get(authenticate, userController.getUsers)
     .post(validateBody, userController.postUsers);
 
-	router.route('/users/:id')
-		.get(validateID, userController.showUsers)
-		.put(authenticate, authorized, validateID, validateBody, userController.editUsers)
-		.delete(authenticate, authorized, validateID, userController.deleteUsers)
+  router.route('/users/:id')
+    .get(validateID, userController.showUsers)
+    .put(authenticate, authorized, validateID, validateBody, userController.editUsers)
+    .delete(authenticate, authorized, validateID, userController.deleteUsers)
 
   /*--- Product ---*/
-	router.route('/products')
-		.get(authenticate, productController.getProducts)
-		.post(validateBody, productController.postProducts);
-	router.route('/products/:id')
-		.get(validateID, productController.showProducts)
-		.put(validateID, validateBody, productController.editProducts)
-		.delete(validateID, productController.deleteProducts)
+  router.route('/products')
+    .get(authenticate, productController.getProducts)
+    .post(validateBody, productController.postProducts);
+  router.route('/products/:id')
+    .get(validateID, productController.showProducts)
+    .put(validateID, validateBody, productController.editProducts)
+    .delete(validateID, productController.deleteProducts)
 
-	/*--- Comment ---*/
-	router.route('/products/:id/comments')
-		.post(validateID, validateBody, commentController.postComments)
-		.get(validateID, commentController.getComments)
-	router.route('/products/:product_id/comments/:comment_id')
+  /*--- Comment ---*/
+  router.route('/products/:id/comments')
+    .post(validateID, validateBody, commentController.postComments)
+    .get(validateID, commentController.getComments)
+  router.route('/products/:product_id/comments/:comment_id')
     .get(validateID, commentController.showComments)
-		.put(validateID, validateBody, commentController.editComments)
-		.delete(validateID, commentController.deleteComments)
+    .put(validateID, validateBody, commentController.editComments)
+    .delete(validateID, commentController.deleteComments)
 
-	/*--- Like ---*/
-	router.route('/products/:product_id/comments/:comment_id/likes')
-		.post(validateID, validateBody, likeController.postLikes)
-		.get(validateID, likeController.getLikes)
+  /*--- Like ---*/
+  router.route('/products/:product_id/comments/:comment_id/likes')
+    .post(validateID, validateBody, likeController.postLikes)
+    .get(validateID, likeController.getLikes)
 
   /*-- Reply --*/
   router.route('/products/:product_id/comments/:comment_id/replies')
@@ -70,10 +71,15 @@ module.exports = function(app) {
     .put(validateID, replyController.editReplies)
     .delete(validateID, replyController.deleteReplies);
 
-	/*--- LikeReply ---*/
-	router.route('/products/:product_id/comments/:comment_id/replies/:reply_id/likes')
-		.post(validateID, validateBody, replyLikeController.postLikes)
-		.get(validateID, replyLikeController.getLikes)
+  /*--- LikeReply ---*/
+  router.route('/products/:product_id/comments/:comment_id/replies/:reply_id/likes')
+    .post(validateID, validateBody, replyLikeController.postLikes)
+    .get(validateID, replyLikeController.getLikes)
+
+  /*--- Rate ---*/
+   router.route('/products/:id/rates')
+    .post(validateID, rateController.postRates)
+    .get(validateID, rateController.getRates)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);

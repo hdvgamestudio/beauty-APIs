@@ -39,10 +39,13 @@ var ProductSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Distributor'
   }],
-  metadata: {
-    rates: [RateSchema],
-    rate: {type: Number, enum: [0, 1, 2, 3, 4, 5]},
-    comments: Number
+  rates: [RateSchema],
+  rate: {
+    type: Number,
+    enum: [0, 1, 2, 3, 4, 5]
+  },
+  comments: {
+    type: Number
   },
   tags: [{
     type: String

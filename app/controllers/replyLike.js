@@ -8,7 +8,7 @@ exports.postLikes = function(req, res, next) {
   var replyID = req.params.reply_id;
   Comment.findOne({
     _id: commentID,
-		"replies._id": replyID,
+    "replies._id": replyID,
     "replies.likes.users": like.user_id
   })
   .exec(function(err, comment) {
@@ -21,8 +21,8 @@ exports.postLikes = function(req, res, next) {
         })
         .exec(function(err, comment) {
           Comment.findOne (
-						{ _id: commentID, "replies._id": replyID },
-						{ "replies.$": 1 })
+            { _id: commentID, "replies._id": replyID },
+            { "replies.$": 1 })
             .exec(function(err, comment) {
               if (err) return next(err);
               if (!comment) res.json({});
@@ -54,7 +54,7 @@ exports.postLikes = function(req, res, next) {
               else {
                 res.json({
                   comment_id: commentID,
-									reply_id: replyID,
+                  reply_id: replyID,
                   likes: comment.replies[0].likes.count,
                   user_id: like.user_id,
                   status: like.UNLIKED
@@ -69,9 +69,9 @@ exports.postLikes = function(req, res, next) {
 exports.getLikes = function(req, res, next) {
   var commentId = req.params.comment_id;
   var replyID = req.params.reply_id;
-	Comment.findOne(
-		{ _id: commentId, "replies._id": replyID },
-		{ "replies.$": 1 })
+  Comment.findOne(
+    { _id: commentId, "replies._id": replyID },
+    { "replies.$": 1 })
     .populate('replies.likes.users')
     .exec(function(err, comment) {
       if (err) return next(err);
