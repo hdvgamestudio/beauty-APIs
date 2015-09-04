@@ -69,8 +69,10 @@ module.exports = function(app) {
 	/*--- Shop ---*/
   router.route('/shops')
 		.get(shopController.getShops)
-		.post(validateBody, shopController.postShops)
-		.put(shopController.putShops)
+		.post(validateBody, shopController.postShops);
+
+	router.route('/shops/:id')
+		.put(validateBody,shopController.putShops)
 		.delete(shopController.deleteShops);
 
   // Register all our routes with /api/v

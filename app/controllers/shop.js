@@ -1,53 +1,74 @@
-//--------------------------
-// DEPENDENCE
+// ------------------------
+// DEPENDENCIES
 // -------------------------
-var Error400    = require('../../lib/errors/error400');
-var ApiErrors    = require('../../lib/apiError');
-var Shop        = require('../models/shop');
+var Error400  = require('../../lib/errors/error400');
+var ApiErrors = require('../../lib/apiError');
+var _         = require('underscore');
+var Shop      = require('../models/shop');
 
 // Method get shop
 exports.getShops = function(req, res, next) {
+  var criteria = {};
   var offset   = req.query.offset;
   var limit    = req.query.limit;
-  var faddress = req.query.address;
-  var fname    = req.query.name;
-  if (faddress || fname){
-    Shop.find({$or: [
-    { name : { $regex: fname }},
-    { address : {$regex: faddress }}
-    ]},
-    function(err, shops){
-      if(err) next(err);
-      else res.json(shops);
-    })
-    .skip(offset)
-    .limit(limit);
+
+  if (req.query.q) {
+    var expr = new RegExp('.*' + req.query.q + '.*');
+    criteria.$or = [
+      { name: expr },
+      { address: expr}
+      ];
   }
+  
+  if (req.query.name) {
+    criteria.name = req.query.name;
+  }
+
+  if (req.query.address) {
+    criteria.address = req.query.address;
+  }
+
+  Shop.find(criteria)
+    .skip(offset)
+    .limit(limit)
+    .exec( function(err, shops){
+      if (err) return next(err);
+      Shop.count(criteria, function(err, count){
+        if(err) return next(err);
+        var record = {};
+        record.total = count;
+        if(limit && (limit != 0)){
+          record.offset         = offset;
+          record.limit          = limit;
+          record.totalPage      = Math.ceil(count/limit);
+          record.CurrentPage    = Math.ceil(offset/limit);
+        }
+        record.receivedRecord = shops.length;
+        res.json({shops: shops, record: record });
+      });
+    });
 }
 
 // Method post shop
 exports.postShops = function(req, res, next) {
   var shop = req.body.shop;
 
-  if (!shop.name) return next(new Error400(
+  if (!shop) return next(new Error400(
     ApiErrors.SHOP_NAME_IS_EMPTY.code,
     ApiErrors.SHOP_NAME_IS_EMPTY.msg
   ));
 
-  Shop.findOne({ name : shop.name })
+  Shop.findOne({ name  : shop.name })
     .exec(function(err, sh){
       if (err) return next(err);
-
-      if (sh) return next();
-      var newShop = new Shop({
-        name: shop.name,
-        address: shop.address,
-        phone: shop.phone,
-        GPS: shop.GPS
-      });
+      if (sh) return next(new Error400(
+        ApiErrors.SHOP_ALREADY_EXISTED.code,
+        ApiErrors.SHOP_ALREADY_EXISTED.msg
+        ));
+      var newShop = new Shop(shop);
       newShop.save(function(err) {
         if (err) return next(err);
-        res.json({ message : 'saved success!'})
+        res.json(newShop);
       });
     });
 }
@@ -55,32 +76,30 @@ exports.postShops = function(req, res, next) {
 // Method put shop
 exports.putShops = function(req, res, next) {
   var shop = req.body.shop;
-  if (!shop.name) return next(new Error400(
-    ApiErrors.SHOP_NAME_EMPTY.code,
-    ApiErrors.SHOP_NAME_EMPTY.msg));
+  var id = req.params.id;
+  if (!shop) return next(new Error400(
+    ApiErrors.SHOPNAME_IS_REQUIRED.code,
+    ApiErrors.SHOPNAME_IS_REQUIRED.msg));
 
-  Shop.findOne({ name : shop.name })
+  Shop.findOne({ _id : id })
       .exec(function(err, sh){
         if (err) return next(err);
         if (!sh) return next(new Error400(
-          ApiErrors.NOT_FIND_SHOP.code,
-          ApiErrors.NOT_FIND_SHOP.msg
+          ApiErrors.SHOP_NOT_FOUND.code,
+          ApiErrors.SHOP_NOT_FOUND.msg
         ));
-        var re = /^\w+@\w+.\w+$/i;
-        if (shop.address) sh.address = shop.address;
-        if (shop.email && re.test( shop.email)) sh.email = shop.email;
-        if (shop.phone) sh.phone = shop.phone;
+        _.extend(sh, shop);
         sh.save(function(err) {
           if (err) return next(err);
-         res.json({ message : 'ok'});
+         res.json(sh);
         });
       });
 }
 
 // Method delete shop
 exports.deleteShops = function(req, res, next) {
-  var id = req.body.shop.id;
-  Shop.remove({_id: id})
+  var id = req.params.id;
+  Shop.remove({ _id: id })
     .exec(function(err, shop) {
       if(err) return next(err);
       res.json(shop);
