@@ -12,6 +12,7 @@ var productController   = require('./controllers/product');
 var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
 var tagController       = require('./controllers/tag');
+var shopController      = require('./controllers/shop');
 
 // Set router for app
 module.exports = function(app) {
@@ -64,10 +65,16 @@ module.exports = function(app) {
   /*--- Tag ---*/
   router.route('/tags')
     .get(tagController.getTags)
-    .post(tagController.postTags);
+    .post(validateBody, tagController.postTags);
+	/*--- Shop ---*/
+  router.route('/shops')
+		.get(shopController.getShops)
+		.post(validateBody, shopController.postShops)
+		.put(shopController.putShops)
+		.delete(shopController.deleteShops);
+
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
-
   // All other requests redirect to 404
   app.all("*", function (req, res, next) {
     next(new Error404());
