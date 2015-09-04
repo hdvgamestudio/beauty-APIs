@@ -15,10 +15,10 @@ exports.getShops = function(req, res, next) {
     Shop.find({$or: [
     { name : { $regex: fname }},
     { address : {$regex: faddress }}
-    ]})
-    .exec( function(err, shops){
+    ]},
+    function(err, shops){
       if(err) next(err);
-      else res.json(shops)
+      else res.json(shops);
     })
     .skip(offset)
     .limit(limit);
@@ -66,12 +66,13 @@ exports.putShops = function(req, res, next) {
           ApiErrors.NOT_FIND_SHOP.code,
           ApiErrors.NOT_FIND_SHOP.msg
         ));
+        var re = /^\w+@\w+.\w+$/i;
         if (shop.address) sh.address = shop.address;
-        if (shop.email) sh.email = shop.email;
+        if (shop.email && re.test( shop.email)) sh.email = shop.email;
         if (shop.phone) sh.phone = shop.phone;
         sh.save(function(err) {
           if (err) return next(err);
-          res.json({ message : 'ok'});
+         res.json({ message : 'ok'});
         });
       });
 }
