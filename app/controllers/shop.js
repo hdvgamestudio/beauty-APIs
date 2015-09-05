@@ -19,7 +19,7 @@ exports.getShops = function(req, res, next) {
       { address: expr}
       ];
   }
-  
+
   if (req.query.name) {
     criteria.name = req.query.name;
   }
@@ -81,19 +81,29 @@ exports.putShops = function(req, res, next) {
     ApiErrors.SHOPNAME_IS_REQUIRED.code,
     ApiErrors.SHOPNAME_IS_REQUIRED.msg));
 
-  Shop.findOne({ _id : id })
-      .exec(function(err, sh){
-        if (err) return next(err);
-        if (!sh) return next(new Error400(
-          ApiErrors.SHOP_NOT_FOUND.code,
-          ApiErrors.SHOP_NOT_FOUND.msg
-        ));
-        _.extend(sh, shop);
-        sh.save(function(err) {
+  Shop.findOne({ name: shop.name })
+    .exec( function(err,findShop){
+      if (err) return next(err);
+      if (findShop) return next(new Error400(
+        ApiErrors.SHOP_ALREADY_EXISTED.code,
+        ApiErrors.SHOP_ALREADY_EXISTED.msg
+      ));
+
+      Shop.findOne({ _id : id })
+        .exec(function(err, sh){
           if (err) return next(err);
-         res.json(sh);
+          if (!sh) return next(new Error400(
+            ApiErrors.SHOP_NOT_FOUND.code,
+            ApiErrors.SHOP_NOT_FOUND.msg
+          ));
+          _.extend(sh, shop);
+          sh.save(function(err) {
+            if (err) return next(err);
+           res.json(sh);
+          });
         });
-      });
+    });
+
 }
 
 // Method delete shop
