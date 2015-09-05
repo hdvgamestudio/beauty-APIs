@@ -24,10 +24,10 @@ var ProductSchema = new Schema({
   modified_at: Date,
   information: String,
   image_url: String,
-  classifications: [{
+  classification: {
     type: Schema.ObjectId,
     ref: 'Classification'
-  }],
+  },
   company: {
     name: String,
     country: String,
