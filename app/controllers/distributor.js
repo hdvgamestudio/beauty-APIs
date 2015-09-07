@@ -67,6 +67,7 @@ exports.postDistributors = function(req, res, next) {
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.msg
     ));
+
   Distributor.findOne({ name : reqDistributor.name })
     .exec( function(err, distributor) {
       if (err) return next(err);
@@ -74,6 +75,7 @@ exports.postDistributors = function(req, res, next) {
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.msg
         ));
+
       var newDistributor = new Distributor(reqDistributor);
       newDistributor.save( function(err) {
         if (err) return next(err);
@@ -90,6 +92,7 @@ exports.editDistributors = function(req, res, next) {
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRE.msg
     ));
+
   Distributor.findOne({ name :reqDistributor.name })
     .exec( function(err, distributor) {
       if (err) return next(err);
@@ -97,6 +100,7 @@ exports.editDistributors = function(req, res, next) {
          ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
          ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.msg
       ));
+
       Distributor.findOne({ _id : id })
         .exec( function( err, distributor) {
           if (err) return next(err);

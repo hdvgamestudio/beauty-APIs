@@ -66,6 +66,7 @@ exports.postShops = function(req, res, next) {
         ApiErrors.SHOP_ALREADY_EXISTED.code,
         ApErrors.SHOP_ALREADY_EXISTED.msg
         ));
+
       var newShop = new Shop(reqShop);
       newShop.save(function(err) {
         if (err) return next(err);
@@ -89,6 +90,7 @@ exports.editShops = function(req, res, next) {
         ApiErrors.SHOP_ALREADY_EXISTED.code,
         ApiErrors.SHOP_ALREADY_EXISTED.msg
       ));
+
       Shop.findOne({ _id : id })
         .exec(function(err, shop){
           if (err) return next(err);
