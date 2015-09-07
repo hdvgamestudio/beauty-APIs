@@ -96,7 +96,6 @@ module.exports = function(app) {
   router.route('/shops')
     .get(shopController.getShops)
     .post(validateBody, shopController.postShops);
-
   router.route('/shops/:id')
     .put(validateBody,shopController.editShops)
     .delete(shopController.deleteShops);
@@ -105,7 +104,6 @@ module.exports = function(app) {
  router.route('/distributors')
    .get(distributorController.getDistributors)
    .post(validateBody, distributorController.postDistributors);
-
  router.route('/distributors/:id')
    .put(validateBody, distributorController.editDistributors)
    .delete(distributorController.deleteDistributors);
