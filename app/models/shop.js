@@ -7,13 +7,13 @@ var ShopSchema = new mongoose.Schema({
   },
   address: String,
   email: {
-		type		 : String,
-		validate : /^\w[\w.]+@\w+.\w+$/
-	},
+    type     : String,
+    validate : /^\w[\w.]+@\w+.\w+$/
+  },
   phone: {
-		type     : String,
-		validate : /^\d+$/
-	},
+    type     : String,
+    validate : /^\d+$/
+  },
   GPS: {longitude: Number, latitude: Number}
 });
 

@@ -13,7 +13,7 @@ var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
 var tagController       = require('./controllers/tag');
 var shopController      = require('./controllers/shop');
-var distriController		= require('./controllers/distributor');
+var distributorController    = require('./controllers/distributor');
 
 // Set router for app
 module.exports = function(app) {
@@ -67,22 +67,22 @@ module.exports = function(app) {
   router.route('/tags')
     .get(tagController.getTags)
     .post(validateBody, tagController.postTags);
-	/*--- Shop ---*/
+  /*--- Shop ---*/
   router.route('/shops')
-		.get(shopController.getShops)
-		.post(validateBody, shopController.postShops);
+    .get(shopController.getShops)
+    .post(validateBody, shopController.postShops);
 
-	router.route('/shops/:id')
-		.put(validateBody,shopController.putShops)
-		.delete(shopController.deleteShops);
-	/*---- Distributor ----*/
+  router.route('/shops/:id')
+    .put(validateBody,shopController.editShops)
+    .delete(shopController.deleteShops);
+  /*---- Distributor ----*/
  router.route('/distributors')
-   .get(distriController.getDistributor)
-   .post(validateBody, distriController.postDistributor);
+   .get(distributorController.getDistributors)
+   .post(validateBody, distributorController.postDistributors);
 
  router.route('/distributors/:id')
-   .put(validateBody, distriController.putDistributor)
-   .delete( distriController.deleteDistributor);
+   .put(validateBody, distributorController.editDistributors)
+   .delete(distributorController.deleteDistributors);
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
   // All other requests redirect to 404

@@ -35,16 +35,17 @@ exports.getShops = function(req, res, next) {
       if (err) return next(err);
       Shop.count(criteria, function(err, count){
         if(err) return next(err);
-        var record = {};
-        record.total = count;
+        var records = {};
+        records.total = count;
         if(limit && (limit != 0)){
-          record.offset         = offset;
-          record.limit          = limit;
-          record.totalPage      = Math.ceil(count/limit);
-          record.CurrentPage    = Math.ceil(offset/limit);
+          records.offset         = offset;
+          records.limit          = limit;
+          records.total_pages    = Math.ceil(count/limit);
+          if (!offset) offset = 0;
+          records.current_page   = Math.floor(offset/limit) + 1;
         }
-        record.receivedRecord = shops.length;
-        res.json({shops: shops, record: record });
+        records.received_records = shops.length;
+        res.json({shops: shops, records: records });
       });
     });
 }
@@ -74,31 +75,31 @@ exports.postShops = function(req, res, next) {
 }
 
 // Method put shop
-exports.putShops = function(req, res, next) {
-  var shop = req.body.shop;
+exports.editShops = function(req, res, next) {
+  var reqShop = req.body.shop;
   var id = req.params.id;
-  if (!shop) return next(new Error400(
+  if (!reqShop) return next(new Error400(
     ApiErrors.SHOPNAME_IS_REQUIRED.code,
     ApiErrors.SHOPNAME_IS_REQUIRED.msg));
 
-  Shop.findOne({ name: shop.name })
-    .exec( function(err,findShop){
+  Shop.findOne({ name: reqShop.name })
+    .exec(function(err, shop){
       if (err) return next(err);
-      if (findShop) return next(new Error400(
+      if (shop) return next(new Error400(
         ApiErrors.SHOP_ALREADY_EXISTED.code,
         ApiErrors.SHOP_ALREADY_EXISTED.msg
       ));
       Shop.findOne({ _id : id })
-        .exec(function(err, sh){
+        .exec(function(err, shop){
           if (err) return next(err);
-          if (!sh) return next(new Error400(
+          if (!shop) return next(new Error400(
             ApiErrors.SHOP_NOT_FOUND.code,
             ApiErrors.SHOP_NOT_FOUND.msg
           ));
-          _.extend(sh, shop);
-          sh.save(function(err) {
+          _.extend(shop, reqShop);
+          shop.save(function(err) {
             if (err) return next(err);
-           res.json(sh);
+           res.json(shop);
           });
         });
     });
