@@ -52,11 +52,11 @@ exports.getDistributors = function(req, res, next) {
         if (limit && (limit != 0)) {
           record.offset = offset;
           record.limit = limit;
-          record.current_page = Math.ceil(offset/limit);
+          record.current_page = Math.floor(offset/limit) + 1;
           record.total_pges = Math.ceil(count/limit);
         }
         record.received_records = distributors.length;
-        res.json({ distributors: distributors, record : record });
+        res.json({ distributors: distributors, records : record });
       });
     });
 }
