@@ -13,6 +13,7 @@ var commentController   = require('./controllers/comment');
 var likeController      = require('./controllers/like');
 var tagController       = require('./controllers/tag');
 var shopController      = require('./controllers/shop');
+var distriController		= require('./controllers/distributor');
 
 // Set router for app
 module.exports = function(app) {
@@ -74,7 +75,14 @@ module.exports = function(app) {
 	router.route('/shops/:id')
 		.put(validateBody,shopController.putShops)
 		.delete(shopController.deleteShops);
+	/*---- Distributor ----*/
+ router.route('/distributors')
+   .get(distriController.getDistributor)
+   .post(validateBody, distriController.postDistributor);
 
+ router.route('/distributors/:id')
+   .put(validateBody, distriController.putDistributor)
+   .delete( distriController.deleteDistributor);
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
   // All other requests redirect to 404

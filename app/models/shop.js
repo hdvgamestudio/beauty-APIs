@@ -8,7 +8,7 @@ var ShopSchema = new mongoose.Schema({
   address: String,
   email: {
 		type		 : String,
-		validate : /^\w+@\w+.\w+$/
+		validate : /^\w[\w.]+@\w+.\w+$/
 	},
   phone: {
 		type     : String,

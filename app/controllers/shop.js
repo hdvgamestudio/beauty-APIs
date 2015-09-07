@@ -17,7 +17,7 @@ exports.getShops = function(req, res, next) {
     criteria.$or = [
       { name: expr },
       { address: expr}
-      ];
+    ];
   }
 
   if (req.query.name) {
@@ -54,16 +54,16 @@ exports.postShops = function(req, res, next) {
   var shop = req.body.shop;
 
   if (!shop) return next(new Error400(
-    ApiErrors.SHOP_NAME_IS_EMPTY.code,
-    ApiErrors.SHOP_NAME_IS_EMPTY.msg
+    ApiErrors.SHOPNAME_IS_REQUIRED.code,
+    ApiErrors.SHOPNAME_IS_REQUIRED.msg
   ));
 
   Shop.findOne({ name  : shop.name })
-    .exec(function(err, sh){
+    .exec( function(err, sh){
       if (err) return next(err);
       if (sh) return next(new Error400(
         ApiErrors.SHOP_ALREADY_EXISTED.code,
-        ApiErrors.SHOP_ALREADY_EXISTED.msg
+        ApErrors.SHOP_ALREADY_EXISTED.msg
         ));
       var newShop = new Shop(shop);
       newShop.save(function(err) {
@@ -88,7 +88,6 @@ exports.putShops = function(req, res, next) {
         ApiErrors.SHOP_ALREADY_EXISTED.code,
         ApiErrors.SHOP_ALREADY_EXISTED.msg
       ));
-
       Shop.findOne({ _id : id })
         .exec(function(err, sh){
           if (err) return next(err);
@@ -103,7 +102,6 @@ exports.putShops = function(req, res, next) {
           });
         });
     });
-
 }
 
 // Method delete shop
