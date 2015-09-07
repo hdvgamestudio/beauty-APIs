@@ -52,21 +52,21 @@ exports.getShops = function(req, res, next) {
 
 // Method post shop
 exports.postShops = function(req, res, next) {
-  var shop = req.body.shop;
+  var reqShop = req.body.shop;
 
-  if (!shop) return next(new Error400(
+  if (!reqShop) return next(new Error400(
     ApiErrors.SHOPNAME_IS_REQUIRED.code,
     ApiErrors.SHOPNAME_IS_REQUIRED.msg
   ));
 
-  Shop.findOne({ name  : shop.name })
-    .exec( function(err, sh){
+  Shop.findOne({ name  : reqShop.name })
+    .exec( function(err, shop){
       if (err) return next(err);
-      if (sh) return next(new Error400(
+      if (shop) return next(new Error400(
         ApiErrors.SHOP_ALREADY_EXISTED.code,
         ApErrors.SHOP_ALREADY_EXISTED.msg
         ));
-      var newShop = new Shop(shop);
+      var newShop = new Shop(reqShop);
       newShop.save(function(err) {
         if (err) return next(err);
         res.json(newShop);

@@ -62,21 +62,19 @@ exports.getDistributors = function(req, res, next) {
 }
 
 exports.postDistributors = function(req, res, next) {
-  var distributor = req.body.distributor;
-  if (!distributor) return next( new Error400(
+  var reqDistributor = req.body.distributor;
+  if (!reqDistributor) return next( new Error400(
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.msg
     ));
-  Distributor.findOne({ name : distributor.name })
-    .exec( function(err, distri) {
+  Distributor.findOne({ name : reqDistributor.name })
+    .exec( function(err, distributor) {
       if (err) return next(err);
-      if (distri) return next(new Error400(
+      if (distributor) return next(new Error400(
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.msg
         ));
-
-      var newDistributor = new Distributor(distributor);
-      console.log(newDistributor);
+      var newDistributor = new Distributor(reqDistributor);
       newDistributor.save( function(err) {
         if (err) return next(err);
         res.json(newDistributor);
