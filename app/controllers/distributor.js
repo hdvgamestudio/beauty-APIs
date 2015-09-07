@@ -7,80 +7,76 @@ var ApiErrors   = require('../../lib/apiError');
 var _           = require('underscore');
 var Distributor = require('../models/distributor');
 
-exports.getDistributor = function(req, res, next) {
-	var id = req.params.id;
-	var offset = req.query.offset;
-	var limit = req.query.limit;
-	var criteria = {};
+exports.getDistributors = function(req, res, next) {
+  var id = req.params.id;
+  var offset = req.query.offset;
+  var limit = req.query.limit;
+  var criteria = {};
 
-	if (req.query.q) {
-		var expr = new RegExp('.*' + req.query.q + '.*');
-		criteria.$or = [
-			{ name : expr },
-		  { information : expr },
-			{ email : expr },
-			{ phone : expr }
-		]
-	}
+  if (req.query.q) {
+    var expr = new RegExp('.*' + req.query.q + '.*');
+    criteria.$or = [
+      { name : expr },
+      { information : expr },
+      { email : expr },
+      { phone : expr }
+    ]
+  }
 
-	if (req.query.name) {
-		criteria.name = req.query.name;
-	}
+  if (req.query.name) {
+    criteria.name = req.query.name;
+  }
 
-	if (req.query.information) {
-		criteria.information = req.query.information;
-	}
+  if (req.query.information) {
+    criteria.information = req.query.information;
+  }
 
-	if (req.query.phone) {
-		criteria.information = req.query.phone;
-	}
+  if (req.query.phone) {
+    criteria.information = req.query.phone;
+  }
 
-	if (req.query.email) {
-		criteria.email = req.query.email;
-	}
+  if (req.query.email) {
+    criteria.email = req.query.email;
+  }
 
-	Distributor.find(criteria)
-		.skip(offset)
-		.limit(limit)
-		.populate('shops','name address')
-		.exec( function(err, dtbutors){
-			if (err) return next(err);
-			Distributor.count(criteria, function(err, count){
-				if (err) return next(err);
-				var record = {};
-				record.total = count;
-				if (limit && (limit != 0)) {
-					record.offset = offset;
-					record.limit = limit;
-					record.currentPages = Math.ceil(offset/limit);
-					record.totalPages = Math.ceil(count/limit);
-				}
-				record.receivedRecords = dtbutors.length;
-				res.json({ distributors: dtbutors, record : record });
-			});
-		});
+  Distributor.find(criteria)
+    .skip(offset)
+    .limit(limit)
+    .populate('shops')
+    .exec( function(err, distributors){
+      if (err) return next(err);
+      Distributor.count(criteria, function(err, count){
+        if (err) return next(err);
+        var record = {};
+        record.total = count;
+        if (limit && (limit != 0)) {
+          record.offset = offset;
+          record.limit = limit;
+          record.current_page = Math.ceil(offset/limit);
+          record.total_pges = Math.ceil(count/limit);
+        }
+        record.received_records = distributors.length;
+        res.json({ distributors: distributors, record : record });
+      });
+    });
 }
 
-exports.postDistributor = function(req, res, next) {
-	console.log("post");
+exports.postDistributors = function(req, res, next) {
   var distributor = req.body.distributor;
   if (!distributor) return next( new Error400(
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.msg
     ));
-	console.log('bug #1');
   Distributor.findOne({ name : distributor.name })
     .exec( function(err, distri) {
-			console.log('bug #2');
       if (err) return next(err);
-			console.log('bug #3');
       if (distri) return next(new Error400(
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.msg
         ));
 
       var newDistributor = new Distributor(distributor);
-			console.log(newDistributor);
+      console.log(newDistributor);
       newDistributor.save( function(err) {
         if (err) return next(err);
         res.json(newDistributor);
@@ -88,41 +84,42 @@ exports.postDistributor = function(req, res, next) {
     });
 }
 
-exports.putDistributor = function(req, res, next) {
+exports.editDistributors = function(req, res, next) {
   var id = req.params.id;
-  var distributor = req.body.distributor;
-  if (!distributor) return next( new Error400(
+  var reqDistributor = req.body.distributor;
+  console.log(reqDistributor);
+  if (!reqDistributor) return next( new Error400(
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRE.msg
     ));
-  Distributor.findOne({ name : distributor.name })
-    .exec( function(err, findDistri) {
+  Distributor.findOne({ name :reqDistributor.name })
+    .exec( function(err, distributor) {
       if (err) return next(err);
-      if (findDistri) return next( new  Error400(
+      if (distributor) return next(new Error400(
          ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
          ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.msg
       ));
       Distributor.findOne({ _id : id })
-        .exec( function( err, distri) {
+        .exec( function( err, distributor) {
           if (err) return next(err);
-          if (!distri) return next( new Error400(
+          if (!distributor) return next( new Error400(
             ApiErrors.DISTRIBUTOR_NOT_FOUND.code,
             ApiErrors.DISTRIBUTOR_NOT_FOUND.msg
           ));
-          _.extend( distri, distributor);
-          distri.save( function(err) {
+          _.extend(distributor, reqDistributor);
+          distributor.save(function(err) {
             if (err) return next(err);
-            res.json(distri);
+            res.json(distributor);
           });
         });
     });
 }
 
-exports.deleteDistributor = function(req, res, next) {
+exports.deleteDistributors = function(req, res, next) {
   var id = req.params.id;
   Distributor.remove({ _id: id })
-    .exec( function(err, distri){
+    .exec( function(err, distributor){
       if (err) return next(err);
-      res.json(distri);
+      res.json(distributor);
     });
 }
