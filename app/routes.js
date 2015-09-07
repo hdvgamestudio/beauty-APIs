@@ -1,21 +1,19 @@
-var express             = require('express');
-var config              = require('../config/config');
-var Error404            = require('../lib/errors/error404');
-var jwtAuth             = require('../lib/jwtAuth');
-var validateID          = require('../app/middleware').validateID;
-var authorized          = require('../app/middleware').authorized;
-var authenticate        = require('../app/middleware').authenticate;
-var validateBody        = require('../app/middleware').validateBody;
-var userController      = require('./controllers/user');
-var authController      = require('./controllers/auth');
-var productController   = require('./controllers/product');
-var commentController   = require('./controllers/comment');
-var likeController      = require('./controllers/like');
-var tagController       = require('./controllers/tag');
-var replyController     = require('./controllers/reply');
-var replyController     = require('./controllers/reply');
-var replyLikeController = require('./controllers/replyLike');
-var rateController      = require('./controllers/rate');
+var express                 = require('express');
+var config                  = require('../config/config');
+var Error404                = require('../lib/errors/error404');
+var jwtAuth                 = require('../lib/jwtAuth');
+var validateID              = require('../app/middleware').validateID;
+var authorized              = require('../app/middleware').authorized;
+var authenticate            = require('../app/middleware').authenticate;
+var validateBody            = require('../app/middleware').validateBody;
+var userController          = require('./controllers/user');
+var authController          = require('./controllers/auth');
+var productController       = require('./controllers/product');
+var commentController       = require('./controllers/comment');
+var likeController          = require('./controllers/like');
+var tagController           = require('./controllers/tag');
+var shopController          = require('./controllers/shop');
+var distributorController   = require('./controllers/distributor');
 
 // Set router for app
 module.exports = function(app) {
@@ -68,7 +66,7 @@ module.exports = function(app) {
   /*--- Tag ---*/
   router.route('/tags')
     .get(tagController.getTags)
-    .post(tagController.postTags);
+    .post(validateBody, tagController.postTags);
 
   /*--- Like ---*/
   router.route('/products/:product_id/comments/:comment_id/likes')
@@ -92,6 +90,25 @@ module.exports = function(app) {
    router.route('/products/:id/rates')
     .post(validateID, rateController.postRates)
     .get(validateID, rateController.getRates)
+    .post(validateBody, tagController.postTags);
+
+  /*--- Shop ---*/
+  router.route('/shops')
+    .get(shopController.getShops)
+    .post(validateBody, shopController.postShops);
+
+  router.route('/shops/:id')
+    .put(validateBody,shopController.editShops)
+    .delete(shopController.deleteShops);
+
+  /*---- Distributor ----*/
+  router.route('/distributors')
+    .get(distributorController.getDistributors)
+    .post(validateBody, distributorController.postDistributors);
+
+  router.route('/distributors/:id')
+    .put(validateBody, distributorController.editDistributors)
+    .delete(distributorController.deleteDistributors);
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);

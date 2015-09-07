@@ -13,8 +13,14 @@ var DistributorSchema = new Schema({
   modified_at: Date,
   information: String,
   website: String,
-  phone_number: String,
-  email_address: String,
+  phone: {
+    type     : String,
+    validate : /^\d+$/
+  },
+  email: {
+    type     : String,
+    validate : /^\w[\w.]+@\w+.\w+$/
+  },
   logo_url: String,
   shops: [{
     type: Schema.ObjectId,
