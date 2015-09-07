@@ -16,6 +16,7 @@ var replyController     = require('./controllers/reply');
 var replyController     = require('./controllers/reply');
 var replyLikeController = require('./controllers/replyLike');
 var rateController      = require('./controllers/rate');
+var shopController      = require('./controllers/shop');
 
 // Set router for app
 module.exports = function(app) {
@@ -92,10 +93,17 @@ module.exports = function(app) {
    router.route('/products/:id/rates')
     .post(validateID, rateController.postRates)
     .get(validateID, rateController.getRates)
+    .post(validateBody, tagController.postTags);
+
+	/*--- Shop ---*/
+  router.route('/shops')
+		.get(shopController.getShops)
+		.post(validateBody, shopController.postShops)
+		.put(shopController.putShops)
+		.delete(shopController.deleteShops);
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
-
   // All other requests redirect to 404
   app.all("*", function (req, res, next) {
     next(new Error404());
