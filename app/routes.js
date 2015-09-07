@@ -66,7 +66,7 @@ module.exports = function(app) {
   /*--- Tag ---*/
   router.route('/tags')
     .get(tagController.getTags)
-    .post(tagController.postTags);
+    .post(validateBody, tagController.postTags);
 
   /*--- Like ---*/
   router.route('/products/:product_id/comments/:comment_id/likes')
@@ -96,17 +96,19 @@ module.exports = function(app) {
   router.route('/shops')
     .get(shopController.getShops)
     .post(validateBody, shopController.postShops);
+
   router.route('/shops/:id')
     .put(validateBody,shopController.editShops)
     .delete(shopController.deleteShops);
 
   /*---- Distributor ----*/
- router.route('/distributors')
-   .get(distributorController.getDistributors)
-   .post(validateBody, distributorController.postDistributors);
- router.route('/distributors/:id')
-   .put(validateBody, distributorController.editDistributors)
-   .delete(distributorController.deleteDistributors);
+  router.route('/distributors')
+    .get(distributorController.getDistributors)
+    .post(validateBody, distributorController.postDistributors);
+
+  router.route('/distributors/:id')
+    .put(validateBody, distributorController.editDistributors)
+    .delete(distributorController.deleteDistributors);
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);
