@@ -9,7 +9,7 @@ var Distributor = require('../models/distributor');
 
 exports.getDistributors = function(req, res, next) {
   var id = req.params.id;
-  var offset = req.query.offset;
+  var offset = req.query.offset ? req.query.offset : 0;
   var limit = req.query.limit;
   var criteria = {};
 
@@ -43,20 +43,20 @@ exports.getDistributors = function(req, res, next) {
     .skip(offset)
     .limit(limit)
     .populate('shops')
-    .exec( function(err, distributors){
+    .exec(function(err, distributors) {
       if (err) return next(err);
-      Distributor.count(criteria, function(err, count){
+      Distributor.count(criteria, function(err, count) {
         if (err) return next(err);
-        var record = {};
-        record.total = count;
+        var records = {};
+        records.total = count;
         if (limit && (limit != 0)) {
-          record.offset = offset;
-          record.limit = limit;
-          record.current_page = Math.floor(offset/limit) + 1;
-          record.total_pges = Math.ceil(count/limit);
+          records.offset = offset;
+          records.limit = limit;
+          records.current_page = Math.floor(offset/limit) + 1;
+          records.total_pages = Math.ceil(count/limit);
         }
-        record.received_records = distributors.length;
-        res.json({ distributors: distributors, records : record });
+        records.received_records = distributors.length;
+        res.json({ distributors: distributors, records : records });
       });
     });
 }
@@ -69,7 +69,7 @@ exports.postDistributors = function(req, res, next) {
     ));
 
   Distributor.findOne({ name : reqDistributor.name })
-    .exec( function(err, distributor) {
+    .exec(function(err, distributor) {
       if (err) return next(err);
       if (distributor) return next(new Error400(
         ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
@@ -77,7 +77,7 @@ exports.postDistributors = function(req, res, next) {
         ));
 
       var newDistributor = new Distributor(reqDistributor);
-      newDistributor.save( function(err) {
+      newDistributor.save(function(err) {
         if (err) return next(err);
         res.json(newDistributor);
       });
@@ -87,14 +87,13 @@ exports.postDistributors = function(req, res, next) {
 exports.editDistributors = function(req, res, next) {
   var id = req.params.id;
   var reqDistributor = req.body.distributor;
-  console.log(reqDistributor);
   if (!reqDistributor) return next( new Error400(
     ApiErrors.DISTRIBUTOR_IS_REQUIRED.code,
     ApiErrors.DISTRIBUTOR_IS_REQUIRE.msg
     ));
 
   Distributor.findOne({ name :reqDistributor.name })
-    .exec( function(err, distributor) {
+    .exec(function(err, distributor) {
       if (err) return next(err);
       if (distributor) return next(new Error400(
          ApiErrors.DISTRIBUTOR_ALREADY_EXISTED.code,
@@ -102,7 +101,7 @@ exports.editDistributors = function(req, res, next) {
       ));
 
       Distributor.findOne({ _id : id })
-        .exec( function( err, distributor) {
+        .exec(function( err, distributor) {
           if (err) return next(err);
           if (!distributor) return next( new Error400(
             ApiErrors.DISTRIBUTOR_NOT_FOUND.code,
@@ -120,7 +119,7 @@ exports.editDistributors = function(req, res, next) {
 exports.deleteDistributors = function(req, res, next) {
   var id = req.params.id;
   Distributor.remove({ _id: id })
-    .exec( function(err, distributor){
+    .exec(function(err, distributor) {
       if (err) return next(err);
       res.json(distributor);
     });

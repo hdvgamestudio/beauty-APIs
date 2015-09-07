@@ -9,7 +9,7 @@ var Shop      = require('../models/shop');
 // Method get shop
 exports.getShops = function(req, res, next) {
   var criteria = {};
-  var offset   = req.query.offset;
+  var offset   = req.query.offset ? req.query.offset : 0;
   var limit    = req.query.limit;
 
   if (req.query.q) {
@@ -33,19 +33,18 @@ exports.getShops = function(req, res, next) {
     .limit(limit)
     .exec( function(err, shops){
       if (err) return next(err);
-      Shop.count(criteria, function(err, count){
-        if(err) return next(err);
+      Shop.count(criteria, function(err, count) {
+        if (err) return next(err);
         var records = {};
         records.total = count;
-        if(limit && (limit != 0)){
-          records.offset         = offset;
-          records.limit          = limit;
-          records.total_pages    = Math.ceil(count/limit);
-          if (!offset) offset = 0;
-          records.current_page   = Math.floor(offset/limit) + 1;
+        if (limit && (limit != 0)) {
+          records.offset = offset;
+          records.limit = limit;
+          records.total_pages = Math.ceil(count/limit);
+          records.current_page = Math.floor(offset/limit) + 1;
         }
         records.received_records = shops.length;
-        res.json({shops: shops, records: records });
+        res.json({ shops: shops, records: records });
       });
     });
 }
@@ -60,7 +59,7 @@ exports.postShops = function(req, res, next) {
   ));
 
   Shop.findOne({ name  : reqShop.name })
-    .exec( function(err, shop){
+    .exec(function(err, shop){
       if (err) return next(err);
       if (shop) return next(new Error400(
         ApiErrors.SHOP_ALREADY_EXISTED.code,
@@ -92,7 +91,7 @@ exports.editShops = function(req, res, next) {
       ));
 
       Shop.findOne({ _id : id })
-        .exec(function(err, shop){
+        .exec(function(err, shop) {
           if (err) return next(err);
           if (!shop) return next(new Error400(
             ApiErrors.SHOP_NOT_FOUND.code,
@@ -112,7 +111,7 @@ exports.deleteShops = function(req, res, next) {
   var id = req.params.id;
   Shop.remove({ _id: id })
     .exec(function(err, shop) {
-      if(err) return next(err);
+      if (err) return next(err);
       res.json(shop);
     });
 }
