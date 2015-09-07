@@ -12,6 +12,9 @@ var productController       = require('./controllers/product');
 var commentController       = require('./controllers/comment');
 var likeController          = require('./controllers/like');
 var tagController           = require('./controllers/tag');
+var replyController         = require('./controllers/reply');
+var replyLikeController     = require('./controllers/replyLike');
+var rateController          = require('./controllers/rate');
 var shopController          = require('./controllers/shop');
 var distributorController   = require('./controllers/distributor');
 
