@@ -10,7 +10,8 @@ var expressValidator   = require('express-validator');
 var morgan             = require('morgan');
 var errorHandler       = require('./lib/errors/errorHandler');
 var config             = require('./config/config');
-var middleware         = require('./app/middleware');
+var middleware         = require('./app/middlewares/middleware');
+var path               = require('path');
 
 var app = express();
 var port = process.env.PORT || 3000;
@@ -33,7 +34,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
-//app.use(middleware.validateBody());
+
+app.use('/static', express.static(path.join(__dirname, 'app/public')));
 
 // Use express-validator to validate requests
 app.use(expressValidator());

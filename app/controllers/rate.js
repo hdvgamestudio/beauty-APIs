@@ -38,12 +38,17 @@ exports.getRates = function(req, res, next) {
       Product.aggregate([
         { $unwind: "$rates" },
         { $project: { _id: 0, value: "$rates.value" } },
-        { $group: { _id: null, average: { $avg: "$value" } } }
+        { $group: { _id: null, average: { $avg: "$value" }, total: { $sum: 1 } } }
       ])
         .exec(function(err, rating) {
           if (err) return next(err);
           var average_rating = Number(rating[0].average).toFixed(1);
-          res.json({ rating_counts: count, average_rating: average_rating });
+          var total = rating[0].total;
+          res.json({
+            average_rating: average_rating,
+            total: total,
+            rating_counts: count
+          });
       })
   })
 }

@@ -1,22 +1,27 @@
-var express                 = require('express');
-var config                  = require('../config/config');
-var Error404                = require('../lib/errors/error404');
-var jwtAuth                 = require('../lib/jwtAuth');
-var validateID              = require('../app/middleware').validateID;
-var authorized              = require('../app/middleware').authorized;
-var authenticate            = require('../app/middleware').authenticate;
-var validateBody            = require('../app/middleware').validateBody;
-var userController          = require('./controllers/user');
-var authController          = require('./controllers/auth');
-var productController       = require('./controllers/product');
-var commentController       = require('./controllers/comment');
-var likeController          = require('./controllers/like');
-var tagController           = require('./controllers/tag');
-var replyController         = require('./controllers/reply');
-var replyLikeController     = require('./controllers/replyLike');
-var rateController          = require('./controllers/rate');
-var shopController          = require('./controllers/shop');
-var distributorController   = require('./controllers/distributor');
+var express                       = require('express');
+var config                        = require('../config/config');
+var Error404                      = require('../lib/errors/error404');
+var jwtAuth                       = require('../lib/jwtAuth');
+var validateID                    = require('./middlewares/middleware').validateID;
+var authorized                    = require('./middlewares/middleware').authorized;
+var authenticate                  = require('./middlewares/middleware').authenticate;
+var validateBody                  = require('./middlewares/middleware').validateBody;
+var multer                        = require('./middlewares/multer')
+var userController                = require('./controllers/user');
+var authController                = require('./controllers/auth');
+var productController             = require('./controllers/product');
+var commentController             = require('./controllers/comment');
+var likeController                = require('./controllers/like');
+var tagController                 = require('./controllers/tag');
+var replyController               = require('./controllers/reply');
+var replyLikeController           = require('./controllers/replyLike');
+var rateController                = require('./controllers/rate');
+var shopController                = require('./controllers/shop');
+var distributorController         = require('./controllers/distributor');
+var classificationController      = require('./controllers/classification');
+var classProductController        = require('./controllers/classificationProduct');
+var avatarController              = require('./controllers/avatar');
+var productImageController        = require('./controllers/productImage');
 
 // Set router for app
 module.exports = function(app) {
@@ -90,7 +95,7 @@ module.exports = function(app) {
     .get(validateID, replyLikeController.getLikes)
 
   /*--- Rate ---*/
-   router.route('/products/:id/rates')
+  router.route('/products/:id/rates')
     .post(validateID, rateController.postRates)
     .get(validateID, rateController.getRates)
     .post(validateBody, tagController.postTags);
@@ -112,6 +117,28 @@ module.exports = function(app) {
   router.route('/distributors/:id')
     .put(validateBody, distributorController.editDistributors)
     .delete(distributorController.deleteDistributors);
+
+  /*--- Classification ---*/
+  router.route('/classifications')
+    .post(classificationController.postClassifications)
+    .get(classificationController.getClassifications)
+  router.route('/classifications/:id')
+    .put(classificationController.editClassifications)
+    .get(classificationController.showClassifications)
+    .delete(classificationController.deleteClassifications)
+
+  router.route('/classifications/:id/products')
+    .get(classProductController.getProducts)
+
+  /*--- Upload avatar ---*/
+  router.route('/users/:id/avatars')
+    .post(avatarController.postAvatars)
+    .get(avatarController.getAvatars)
+
+  /*--- Upload product image---*/
+  router.route('/products/:id/images')
+    .post(productImageController.postImages)
+    .get(productImageController.getImages)
 
   // Register all our routes with /api/v
   app.use(config.apiPath, router);

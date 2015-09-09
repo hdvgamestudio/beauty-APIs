@@ -7,15 +7,12 @@ var ClassificationSchema = new Schema({
     required: true
   },
   childs: [{
-    _id: {
-      type: Schema.ObjectId
-    },
-    name: {
-      type: String
-    }
+    type: Schema.ObjectId,
+    ref: 'Classification'
   }],
   parents: {
     type: Schema.ObjectId,
+    ref: 'Classification'
   }
 });
 

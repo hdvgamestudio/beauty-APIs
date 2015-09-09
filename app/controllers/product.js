@@ -10,14 +10,14 @@ exports.postProducts = function(req, res, next) {
   var newProduct = req.body.product;
   if (!newProduct.name) {
     return next(new Error400(
-        ApiErrors.PRODUCTNAME_REQUIRED.code,
-        ApiErrors.PRODUCTNAME_REQUIRED.msg
+      ApiErrors.PRODUCTNAME_REQUIRED.code,
+      ApiErrors.PRODUCTNAME_REQUIRED.msg
     ));
   }
   if (!newProduct.code) {
     return next(new Error400(
-        ApiErrors.PRODUCTCODE_REQUIRED.code,
-        ApiErrors.PRODUCTCODE_REQUIRED.msg
+      ApiErrors.PRODUCTCODE_REQUIRED.code,
+      ApiErrors.PRODUCTCODE_REQUIRED.msg
     ));
   }
 
@@ -87,7 +87,7 @@ exports.getProducts = function(req, res, next) {
     .sort(sort)
     .skip(skip)
     .limit(limit)
-    .populate('classifications')
+    .populate('classification')
     .populate('distributors')
     .exec(function(err, products) {
       if (err) return next(err);
@@ -112,14 +112,14 @@ exports.editProducts = function(req, res, next) {
   var updatedProduct = req.body.product;
   if (!updatedProduct.name) {
     return next(new Error400(
-        ApiErrors.PRODUCTNAME_REQUIRED.code,
-        ApiErrors.PRODUCTNAME_REQUIRED.msg
+      ApiErrors.PRODUCTNAME_REQUIRED.code,
+      ApiErrors.PRODUCTNAME_REQUIRED.msg
     ));
   }
   if (!updatedProduct.code) {
     return next(new Error400(
-        ApiErrors.PRODUCTCODE_REQUIRED.code,
-        ApiErrors.PRODUCTCODE_REQUIRED.msg
+      ApiErrors.PRODUCTCODE_REQUIRED.code,
+      ApiErrors.PRODUCTCODE_REQUIRED.msg
     ));
   }
   Product.findOne({ _id: { $ne: id },
