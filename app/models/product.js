@@ -23,7 +23,10 @@ var ProductSchema = new Schema({
   },
   modified_at: Date,
   information: String,
-  image_url: String,
+  image: {
+    type: Schema.ObjectId,
+    ref: 'Image'
+  },
   classification: {
     type: Schema.ObjectId,
     ref: 'Classification'

@@ -27,8 +27,9 @@ var UserSchema = new mongoose.Schema({
   phone_number: {
     type: Number,
   },
-  avatar_url: {
-    type: String,
+  avatar: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Image'
   },
   created_at: {
     type: Date,

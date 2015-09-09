@@ -131,6 +131,7 @@ exports.getUsers = function(req, res, next) {
 
 exports.showUsers = function(req, res, next) {
   User.findOne({ "_id": req.params.id })
+    .populate('avatar')
     .exec(function(err, user) {
       if (err) return next(err);
       if (!user) res.json({});

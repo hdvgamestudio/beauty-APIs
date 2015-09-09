@@ -17,6 +17,7 @@ var defaults = {
     version: '1.0.0'
   },
   root: path.normalize(__dirname + '/..'),
+  static_dir: path.normalize(__dirname + '/../app/public'),
   jwt: {
     secretKey: '123456',
     expiresInMinutes: 1440 // Expires in 24 hours
