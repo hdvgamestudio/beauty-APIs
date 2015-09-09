@@ -16,11 +16,12 @@ var tagController                 = require('./controllers/tag');
 var replyController               = require('./controllers/reply');
 var replyLikeController           = require('./controllers/replyLike');
 var rateController                = require('./controllers/rate');
+var shopController                = require('./controllers/shop');
+var distributorController         = require('./controllers/distributor');
 var classificationController      = require('./controllers/classification');
 var classProductController        = require('./controllers/classificationProduct');
 var avatarController              = require('./controllers/avatar');
 var productImageController        = require('./controllers/productImage');
-
 
 // Set router for app
 module.exports = function(app) {
@@ -73,7 +74,7 @@ module.exports = function(app) {
   /*--- Tag ---*/
   router.route('/tags')
     .get(tagController.getTags)
-    .post(tagController.postTags);
+    .post(validateBody, tagController.postTags);
 
   /*--- Like ---*/
   router.route('/products/:product_id/comments/:comment_id/likes')
@@ -97,6 +98,25 @@ module.exports = function(app) {
   router.route('/products/:id/rates')
     .post(validateID, rateController.postRates)
     .get(validateID, rateController.getRates)
+    .post(validateBody, tagController.postTags);
+
+  /*--- Shop ---*/
+  router.route('/shops')
+    .get(shopController.getShops)
+    .post(validateBody, shopController.postShops);
+
+  router.route('/shops/:id')
+    .put(validateBody,shopController.editShops)
+    .delete(shopController.deleteShops);
+
+  /*---- Distributor ----*/
+  router.route('/distributors')
+    .get(distributorController.getDistributors)
+    .post(validateBody, distributorController.postDistributors);
+
+  router.route('/distributors/:id')
+    .put(validateBody, distributorController.editDistributors)
+    .delete(distributorController.deleteDistributors);
 
   /*--- Classification ---*/
   router.route('/classifications')

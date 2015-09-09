@@ -6,8 +6,14 @@ var ShopSchema = new mongoose.Schema({
     required: true
   },
   address: String,
-  email_address: String,
-  phone_number: String,
+  email: {
+    type     : String,
+    validate : /^\w[\w.]+@\w+.\w+$/
+  },
+  phone: {
+    type     : String,
+    validate : /^\d+$/
+  },
   GPS: {longitude: Number, latitude: Number}
 });
 
