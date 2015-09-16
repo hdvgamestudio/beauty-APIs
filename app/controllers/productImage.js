@@ -6,8 +6,8 @@ var ApiErrors  = require('../../lib/apiError');
 var Error400   = require('../../lib/errors/error400');
 var gm         = require('gm');
 
-var relativePath = '/upload/product/'
-var upload = multer(config.static_dir + relativePath).single('productImage')
+var relativePath = '/product/';
+var upload = multer(config.upload_dir + relativePath).single('productImage');
 
 exports.postImages = function(req, res, next) {
   var productId = req.params.id;
@@ -22,7 +22,7 @@ exports.postImages = function(req, res, next) {
       return next(err);
     }
     var imageUrl = relativePath + req.file.filename;
-    gm(config.static_dir + imageUrl).size(function(err, dimension) {
+    gm(config.upload_dir + imageUrl).size(function(err, dimension) {
       if (err) return next(err);
       var image = new Image({
         origin: {
