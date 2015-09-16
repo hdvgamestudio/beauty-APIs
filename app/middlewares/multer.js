@@ -21,13 +21,14 @@ module.exports = function(uploadDir) {
   var fileFilter = function(req, file, cb) {
     // Valid mimetypes
     var mimetypes = ["image/png", "image/jpg", "image/jpeg"];
-    if (mimetypes.indexOf(file.mimetype) > -1)
+    if (mimetypes.indexOf(file.mimetype) > -1) {
       cb(null, true);
-    else
+    } else {
       cb(new Error400(
         ApiErrors.INVALID_FILE_FORMAT.code,
         ApiErrors.INVALID_FILE_FORMAT.msg
       ));
+    }
   }
 
   return multer({

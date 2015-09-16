@@ -35,7 +35,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.use('/static', express.static(path.join(__dirname, 'app/public')));
+app.use('/static', express.static(config.static_dir));
 
 // Use express-validator to validate requests
 app.use(expressValidator());

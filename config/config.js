@@ -18,6 +18,8 @@ var defaults = {
   },
   root: path.normalize(__dirname + '/..'),
   static_dir: path.normalize(__dirname + '/../app/public'),
+  upload_dir: path.normalize(__dirname + '/../app/public/upload'),
+  log_dir: path.normalize(__dirname + '/../logs'),
   jwt: {
     secretKey: '123456',
     expiresInMinutes: 1440 // Expires in 24 hours
